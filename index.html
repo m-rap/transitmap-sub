@@ -19,6 +19,7 @@
       var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
       var txtLat;
       var txtLng;
+      var txtLongCoord;
       var directionsService;
       var data;
       
@@ -40,11 +41,13 @@
       window.onload = function() {
         txtLat = document.getElementById('txtLat');
         txtLng = document.getElementById('txtLng');
+        txtLongCoord = document.getElementById('txtLongCoord');
       }
       
-      function drawDirections(rute) {
-        console.log(rute);
-        directionsService.route(rute.request, function(response, status) {
+      function drawDirections(rute, i) {
+        if (i >= rute.length)
+          return;
+        directionsService.route(rute[i].request, function(response, status) {
           if (status == google.maps.DirectionsStatus.OK) {
             //console.log(response);
             //for (i = 0; i < response.routes[0].overview_path.length; i++) {
@@ -52,13 +55,16 @@
             //  var marker = new google.maps.Marker({position: response.routes[0].overview_path[i], map: map});
             //}
             var polylineOptions = {
-              strokeColor: rute.color,
+              strokeColor: rute[i].color,
               //strokeOpacity: 1.0,
               strokeWeight: 3
             };
             var directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true, polylineOptions: polylineOptions});
             directionsRenderer.setMap(map);
             directionsRenderer.setDirections(response);
+            
+            i++;
+            drawDirections(rute, i);
           }
         });
       }
@@ -66,8 +72,8 @@
       function drawAll() {
         for (a in data) {
           //if (data[a].nama != 'G') continue;
-          drawDirections(data[a].berangkat);
-          drawDirections(data[a].kembali);
+          drawDirections(data[a].berangkat, 0);
+          drawDirections(data[a].kembali, 0);
         }
       }
       
@@ -90,6 +96,7 @@
           var latLng = e.latLng;
           txtLat.value = latLng.lat();
           txtLng.value = latLng.lng();
+          txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '}';
         });
         //var marker = new google.maps.Marker({
         //  position: currLoc,
@@ -111,5 +118,6 @@
     <input type="button" onclick="addMarker()" value="add marker" />
     <input type="text" id="txtLat" />
     <input type="text" id="txtLng" />
+    <input type="text" id="txtLongCoord" />
   </body>
 </html>

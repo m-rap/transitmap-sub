@@ -3,7 +3,7 @@ function initData() {
     [
       {
         nama: 'BM',
-        berangkat: {
+        berangkat: [{
           request: {
             origin: 'Terminal Bratang', 
             destination: 'Terminal Menanggal',
@@ -21,8 +21,8 @@ function initData() {
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#61bb46'
-        },
-        kembali: {
+        }],
+        kembali: [{
           request: {
             origin: 'Terminal Menanggal', 
             destination: 'Terminal Bratang',
@@ -43,11 +43,11 @@ function initData() {
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#619946'
-        },
+        }],
       },
       {
         nama: 'V',
-        berangkat: {
+        berangkat: [{
           request: {
             origin: 'Terminal Joyoboyo', 
             destination: 'Jl. Tambak Rejo',
@@ -59,8 +59,8 @@ function initData() {
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#eeb211'
-        },
-        kembali: {
+        }],
+        kembali: [{
           request: {
             origin: 'Jl. Tambak Rejo', 
             destination: 'Terminal Joyoboyo',
@@ -74,16 +74,16 @@ function initData() {
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#eea111'
-        },
+        }],
       },
       {
         nama: 'G',
-        berangkat: {
+        berangkat: [{
           request: {
             origin: 'Terminal Joyoboyo', 
             destination: {lat: -7.266504239227583, lng: 112.76083409786224}, // karang menjangan
             waypoints: [
-              {location: {lat: -7.2946696, lng: 112.7331327}, stopover: false}, // ciliwung
+              {location: {lat: -7.295097516565724, lng: 112.73362308740616}, stopover: false}, // ciliwung
               {location: {lat: -7.295187973467072, lng: 112.73264408111572}, stopover: false}, // adityawarman
               {location: {lat: -7.29189426627404, lng: 112.72911429405212}, stopover: false}, // patmosusastro
               {location: srw, stopover: false}, // sriwijaya
@@ -95,24 +95,32 @@ function initData() {
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#bdd09f'
-        },
-        kembali: {
+        }],
+        kembali: [{
           request: {
             origin: {lat: -7.266511556061784, lng: 112.7608897536993}, // karang menjangan 
-            destination: 'Terminal Joyoboyo',
+            destination: {lat: -7.295532507673926, lng: 112.73328378796577}, // adityawarman 1
             waypoints: [
               {location: {lat: -7.280230410523453, lng: 112.76830673217773}, stopover: false}, // manyar kertoarjo
               {location: {lat: -7.272844563955261, lng: 112.74493932723999}, stopover: false}, // karimun jawa
               {location: {lat: -7.292407745645709, lng: 112.73001551628113}, stopover: false}, // indragiri
-              {location: {lat: -7.295384850189182, lng: 112.73311346769333}, stopover: false}, // adityawarman 1
-              {location: {lat: -7.295187973467072, lng: 112.73264408111572}, stopover: false}, // adityawarman 2
+            ],
+            optimizeWaypoints: false,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING
+          },
+          color: '#bdc09f'
+        }, {
+          request: {
+            origin: {lat: -7.29560833176879, lng: 112.733234167099}, // adityawarman 2
+            destination: 'Terminal Joyoboyo',
+            waypoints: [
               {location: {lat: -7.298087905615413, lng: 112.72976875305176}, stopover: false}, // brawijaya
             ],
             optimizeWaypoints: false,
             travelMode: google.maps.DirectionsTravelMode.DRIVING
           },
           color: '#bdc09f'
-        },
+        }],
       },
     ];
 }
