@@ -17,8 +17,7 @@ function initData() {
               {location: {lat: -7.338893142192041, lng: 112.71773099899292}, stopover: false}, // wisma pagesangan i
               {location: {lat: -7.341319271039199, lng: 112.72087454795837}, stopover: false}, // cipta menanggal
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
           color: '#61bb46'
         }],
@@ -39,10 +38,9 @@ function initData() {
               {location: {lat: -7.321193906070934, lng: 112.7487963438034}, stopover: false}, // tenggilis
               {location: {lat: -7.319911619400143, lng: 112.74740695953369}, stopover: false}, // jemursari
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
-          color: '#619946'
+          color: '#61bb46'
         }],
       },
       {
@@ -55,8 +53,7 @@ function initData() {
               {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false}, // wijaya kusuma
               {location: {lat: -7.248674756201677, lng: 112.75976657867432}, stopover: false}, // tambak segaran wetan
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
           color: '#eeb211'
         }],
@@ -70,10 +67,9 @@ function initData() {
               {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false}, // wijaya kusuma
               {location: {lat: -7.307239861748596, lng: 112.73531019687653}, stopover: false}, // putar balik
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
-          color: '#eea111'
+          color: '#eeb211'
         }],
       },
       {
@@ -91,8 +87,7 @@ function initData() {
               {location: {lat: -7.277495320133082, lng: 112.75199890136719}, stopover: false}, // kertajaya
               {location: {lat: -7.278687268189972, lng: 112.76223421096802}, stopover: false}, // raya menur
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
           color: '#bdd09f'
         }],
@@ -105,10 +100,9 @@ function initData() {
               {location: {lat: -7.272844563955261, lng: 112.74493932723999}, stopover: false}, // karimun jawa
               {location: {lat: -7.292407745645709, lng: 112.73001551628113}, stopover: false}, // indragiri
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
-          color: '#bdc09f'
+          color: '#bdd09f'
         }, {
           request: {
             origin: {lat: -7.29560833176879, lng: 112.733234167099}, // adityawarman 2
@@ -116,10 +110,9 @@ function initData() {
             waypoints: [
               {location: {lat: -7.298087905615413, lng: 112.72976875305176}, stopover: false}, // brawijaya
             ],
-            optimizeWaypoints: false,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            optimizeWaypoints: false
           },
-          color: '#bdc09f'
+          color: '#bdd09f'
         }],
       },
     ];

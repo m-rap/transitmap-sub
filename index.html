@@ -20,8 +20,10 @@
       var txtLat;
       var txtLng;
       var txtLongCoord;
+      var selRoute;
       var directionsService;
-      var data;
+      var data = null;
+      var selected = -1;
       
       function getJSON(url, callback) {
         var xhr = new XMLHttpRequest();
@@ -42,11 +44,35 @@
         txtLat = document.getElementById('txtLat');
         txtLng = document.getElementById('txtLng');
         txtLongCoord = document.getElementById('txtLongCoord');
+        selRoute = document.getElementById('selRoute');
+        
+        initData();
+        var selRouteOptions = selRoute.innerHTML;
+        for (a in data)
+          selRouteOptions += "<option value=\"" + a + "\">" + data[a].nama + "</option>";
+        selRoute.innerHTML = selRouteOptions;
       }
       
       function drawDirections(rute, i) {
-        if (i >= rute.length)
+        if (i >= rute.length) {
+          //selRoute.disabled = true;
+          //setTimeout(function () { selRoute.disabled = false }, 5000);
           return;
+        }
+        
+        if (typeof(rute[i].renderer) != 'undefined') {
+          if (rute[i].renderer != null) {
+            rute[i].renderer.setMap(null);
+            rute[i].renderer = null;
+          }
+        }
+        
+        if (!rute[i].isSelected) {
+          i++;
+          drawDirections(rute, i);
+          return;
+        }
+        
         directionsService.route(rute[i].request, function(response, status) {
           if (status == google.maps.DirectionsStatus.OK) {
             //console.log(response);
@@ -54,31 +80,58 @@
             //  console.log(response.routes[0].overview_path[i].toString());
             //  var marker = new google.maps.Marker({position: response.routes[0].overview_path[i], map: map});
             //}
+            
             var polylineOptions = {
               strokeColor: rute[i].color,
-              //strokeOpacity: 1.0,
               strokeWeight: 3
             };
-            var directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true, polylineOptions: polylineOptions});
-            directionsRenderer.setMap(map);
-            directionsRenderer.setDirections(response);
+            
+            if (rute[i].isSelected)
+              polylineOptions.strokeOpacity= 1.0;
+            else
+              polylineOptions.strokeOpacity= 0.2;
+            
+            rute[i].renderer = new google.maps.DirectionsRenderer({suppressMarkers: true, polylineOptions: polylineOptions, preserveViewport: true});
+            rute[i].renderer.setMap(map);
+            rute[i].renderer.setDirections(response);
             
             i++;
             drawDirections(rute, i);
+          } else {
+            console.log(i + ' ' + status);
           }
         });
       }
       
       function drawAll() {
+        var rute = new Array();
         for (a in data) {
           //if (data[a].nama != 'G') continue;
-          drawDirections(data[a].berangkat, 0);
-          drawDirections(data[a].kembali, 0);
+          var isSelected = a == selected || selected == -1;
+          for (i in data[a].berangkat) {
+            data[a].berangkat[i].isSelected = isSelected;
+            rute.push(data[a].berangkat[i]);
+          }
+          for (i in data[a].kembali) {
+            data[a].kembali[i].isSelected = isSelected;
+            rute.push(data[a].kembali[i]);
+          }
         }
+        drawDirections(rute, 0);
       }
       
       function initMap() {
-        initData();
+        if (data == null) {
+          setTimeout(initMap, 50);
+          return;
+        }
+        
+        for (a in data) {
+          for (i in data[a].berangkat)
+            data[a].berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+          for (i in data[a].kembali)
+            data[a].kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+        }
         
         currLoc = srw;
         map = new google.maps.Map(document.getElementById('map'), {
@@ -96,7 +149,7 @@
           var latLng = e.latLng;
           txtLat.value = latLng.lat();
           txtLng.value = latLng.lng();
-          txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '}';
+          txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
         });
         //var marker = new google.maps.Marker({
         //  position: currLoc,
@@ -106,10 +159,16 @@
         directionsService = new google.maps.DirectionsService();
         drawAll();
       }
+      
       function addMarker() {
         var pos = {lat: Number(txtLat.value), lng: Number(txtLng.value)};
         var marker = new google.maps.Marker({position: pos, map: map});
         currLoc = pos;
+      }
+      
+      function selectRoute() {
+        selected = Number(selRoute.options[selRoute.selectedIndex].value);
+        drawAll();
       }
     </script>
     <script async defer
@@ -119,5 +178,8 @@
     <input type="text" id="txtLat" />
     <input type="text" id="txtLng" />
     <input type="text" id="txtLongCoord" />
+    <select id="selRoute" onchange="selectRoute()">
+      <option value="-1" selected>Semua</option>
+    </select>
   </body>
 </html>
