@@ -69,6 +69,22 @@
           selRoute.innerHTML = selRouteOptions;
         }
 
+        // reference: https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+        function hexToRgb(hex) {
+          // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+          var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+          hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+              return r + r + g + g + b + b;
+          });
+
+          var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+          return result ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          } : null;
+        }
+        
         function drawDirections(rute, i) {
           if (i >= rute.length) {
             //selRoute.disabled = true;
@@ -93,6 +109,7 @@
             if (status == google.maps.DirectionsStatus.OK) {
               //console.log(rute[i]);
               //console.log(response);
+              renderCtx.beginPath();
               for (j = 0; j < response.routes[0].overview_path.length; j++) {
                 //console.log(response.routes[0].overview_path[j]);
                 var latLng = response.routes[0].overview_path[j];
@@ -104,7 +121,6 @@
                 }
                 //var marker = new google.maps.Marker({position: response.routes[0].overview_path[i], map: map});
               }
-              renderCtx.stroke();
 
               var polylineOptions = {
                 strokeColor: rute[i].color,
@@ -112,9 +128,15 @@
               };
 
               if (rute[i].isSelected)
-                polylineOptions.strokeOpacity= 1.0;
+                polylineOptions.strokeOpacity = 1.0;
               else
-                polylineOptions.strokeOpacity= 0.2;
+                polylineOptions.strokeOpacity = 0.2;
+              
+              var rgb = hexToRgb(rute[i].color);
+              
+              renderCtx.lineWidth = polylineOptions.strokeWeight;
+              renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + polylineOptions.strokeOpacity + ')';
+              renderCtx.stroke();
 
               //rute[i].renderer = new google.maps.DirectionsRenderer({suppressMarkers: true, polylineOptions: polylineOptions, preserveViewport: true});
               //rute[i].renderer.setMap(map);
