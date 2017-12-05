@@ -82,7 +82,7 @@ function initData() {
               {location: {lat: -7.295097516565724, lng: 112.73362308740616}, stopover: false}, // ciliwung
               {location: {lat: -7.295187973467072, lng: 112.73264408111572}, stopover: false}, // adityawarman
               {location: {lat: -7.29189426627404, lng: 112.72911429405212}, stopover: false}, // patmosusastro
-              {location: srw, stopover: false}, // sriwijaya
+              {location: {lat: -7.279860921538657, lng: 112.74188160896301}, stopover: false}, // sriwijaya
               {location: {lat: -7.272394917353678, lng: 112.74935156106949}, stopover: false}, // bangka
               {location: {lat: -7.277495320133082, lng: 112.75199890136719}, stopover: false}, // kertajaya
               {location: {lat: -7.278687268189972, lng: 112.76223421096802}, stopover: false}, // raya menur

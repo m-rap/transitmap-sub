@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div style="position: relative;">
+      <div id="map"></div>
+      <canvas id="renderCanvas"></canvas>
+      <script src="/data/sub.js"></script>
+      <script>
+        var directionsService;
+        var data = null;
+        var routes = new Array();
+
+        window.onload = function() {
+          initData();
+        }
+        
+        function drawDirections(rute, i) {
+          if (i >= rute.length) {
+            document.body.innerHTML = JSON.stringify(routes);
+            return;
+          }
+
+          directionsService.route(rute[i].request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              var path = new Array();
+              for (k in response.routes) {
+                for (j in response.routes[k].overview_path) {
+                  path.push(response.routes[k].overview_path[j]);
+                }
+              }
+              routes.push({nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
+            } else {
+              console.log(i + ' ' + status);
+            }
+            
+            i++;
+            drawDirections(rute, i);
+          });
+        }
+
+        function initMap() {
+          if (data == null) {
+            setTimeout(initMap, 50);
+            return;
+          }
+
+          for (a in data) {
+            for (i in data[a].berangkat)
+              data[a].berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+            for (i in data[a].kembali)
+              data[a].kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+          }
+
+          directionsService = new google.maps.DirectionsService();
+          
+          var rute = new Array();
+          for (a in data) {
+            for (i in data[a].berangkat) {
+              data[a].berangkat[i].nama = data[a].nama;
+              data[a].berangkat[i].tipe = 'berangkat';
+              rute.push(data[a].berangkat[i]);
+            }
+            for (i in data[a].kembali) {
+              data[a].kembali[i].nama = data[a].nama;
+              data[a].kembali[i].tipe = 'kembali';
+              rute.push(data[a].kembali[i]);
+            }
+          }
+          drawDirections(rute, 0);
+        }
+      </script>
+      <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=initMap">
+      </script>
+    </div>
+  </body>
+</html>
