@@ -20,27 +20,54 @@
     <div style="position: relative;">
       <div id="map"></div>
       <canvas id="renderCanvas"></canvas>
-      <script src="/data/sub.js"></script>
       <script>
         var currLoc;
         var mapDiv;
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
+        var dragging = false;
         var txtLat;
         var txtLng;
         var txtLongCoord;
-        var selRoute;
+        var selType;
         var directionsService;
-        var data = null;
+        var data = 
+            [
+              {
+                nama: null,
+                berangkat: [{
+                  request: {
+                    origin: null, 
+                    destination: null,
+                    waypoints: [
+                    ],
+                    optimizeWaypoints: false
+                  },
+                  color: '#61bb46'
+                }],
+                kembali: [{
+                  request: {
+                    origin: null, 
+                    destination: null,
+                    waypoints: [
+                    ],
+                    optimizeWaypoints: false
+                  },
+                  color: '#61bb46'
+                }]
+              }
+            ];
         var selected = -1;
         var canvasInitialized = false;
         var renderCanvas;
-        var renderCtx;
+        var renderCtx = null;
         var bounds;
         var mapWidth;
         var mapHeight;
         var widthRatio;
         var heightRatio;
+        var cameraSpeed = 0;
+        var lastLoc;
 
         function getJSON(url, callback) {
           var xhr = new XMLHttpRequest();
@@ -61,13 +88,7 @@
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
           txtLongCoord = document.getElementById('txtLongCoord');
-          selRoute = document.getElementById('selRoute');
-
-          initData();
-          var selRouteOptions = selRoute.innerHTML;
-          for (a in data)
-            selRouteOptions += "<option value=\"" + a + "\">" + data[a].nama + "</option>";
-          selRoute.innerHTML = selRouteOptions;
+          selType = document.getElementById('selType');
         }
 
         // reference: https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
@@ -100,12 +121,6 @@
             }
           }
 
-          if (!rute[i].isSelected) {
-            i++;
-            drawDirections(rute, i);
-            return;
-          }
-
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
               //console.log(rute[i]);
@@ -128,10 +143,7 @@
                 strokeWeight: 3
               };
 
-              if (rute[i].isSelected)
-                polylineOptions.strokeOpacity = 1.0;
-              else
-                polylineOptions.strokeOpacity = 0.2;
+              polylineOptions.strokeOpacity = 1.0;
               
               var rgb = hexToRgb(rute[i].color);
               
@@ -146,7 +158,10 @@
               i++;
               drawDirections(rute, i);
             } else {
-              console.log(i + ' ' + status);
+              console.log(i + ' ' + status + '. retrying..');
+              setTimeout(function() {
+                drawDirections(rute, i)
+              }, 2000);
             }
           });
         }
@@ -167,50 +182,36 @@
           mapHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
           widthRatio = renderCanvas.width / mapWidth;
           heightRatio = renderCanvas.height / mapHeight;
-          
-          //console.log(mapWidth + ' ' + mapHeight + ' ' + widthRatio + ' ' + heightRatio);
-          
-          //renderCtx.moveTo(0,0);
-          //renderCtx.lineTo(1520,600);
-          //renderCtx.stroke();
         }
 
         function drawAll() {
           initCanvas();
           
-          selected = Number(selRoute.options[selRoute.selectedIndex].value);
-          var rute = new Array();
-          for (a in data) {
-            //if (data[a].nama != 'G') continue;
-            var isSelected = a == selected || selected == -1;
-            console.log(isSelected);
-            for (i in data[a].berangkat) {
-              data[a].berangkat[i].isSelected = isSelected;
-              if (isSelected)
-                rute.push(data[a].berangkat[i]);
-            }
-            for (i in data[a].kembali) {
-              data[a].kembali[i].isSelected = isSelected;
-              if (isSelected)
-                rute.push(data[a].kembali[i]);
-            }
-          }
-          drawDirections(rute, 0);
-        }
-
-        function initMap() {
-          if (data == null) {
-            setTimeout(initMap, 50);
-            return;
-          }
-
           for (a in data) {
             for (i in data[a].berangkat)
               data[a].berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
             for (i in data[a].kembali)
               data[a].kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
           }
+          
+          var rute = new Array();
+          for (a in data) {
+            for (i in data[a].berangkat) {
+              if (data[a].berangkat[i].request.origin == null || data[a].berangkat[i].request.destination == null)
+                continue;
+              rute.push(data[a].berangkat[i]);
+            }
+            for (i in data[a].kembali) {
+              if (data[a].kembali[i].request.origin == null || data[a].kembali[i].request.destination == null)
+                continue;
+              rute.push(data[a].kembali[i]);
+            }
+          }
+          if (rute.length > 0)
+            drawDirections(rute, 0);
+        }
 
+        function initMap() {
           currLoc = srw;
           mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
@@ -224,6 +225,10 @@
               //},
             ]
           });
+          
+          currLoc = map.getCenter();
+          lastLoc = currLoc;
+          
           map.addListener('click', function(e) {
             var latLng = e.latLng;
             txtLat.value = latLng.lat();
@@ -237,13 +242,78 @@
 
           directionsService = new google.maps.DirectionsService();
           
-          map.addListener('bounds_changed', function() {
-            drawAll();
+          map.addListener('dragstart', function() {
+            dragging = true;
+            if (renderCtx != null)
+              renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
           });
           
-          map.addListener('center_changed', function() {
-            drawAll();
+          map.addListener('dragend', function() {
+            dragging = false;
           });
+          
+          setInterval(function() {
+            var center = map.getCenter();
+            cameraSpeed = Math.sqrt(Math.pow(center.lat() - currLoc.lat(), 2) + Math.pow(center.lng() - currLoc.lng(), 2));
+            currLoc = center;
+            if (cameraSpeed === 0.0) {
+              if (currLoc.lat() != lastLoc.lat() || currLoc.lng() != lastLoc.lng()) {
+                drawAll();
+                lastLoc = currLoc;
+              }
+            } else {
+              if (renderCtx != null)
+                renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+            }
+          }, 100);
+          
+          
+          //map.addListener('bounds_changed', function() {
+          //  console.log('bounds changed');
+          //  drawAll();
+          //});
+          
+          //map.addListener('center_changed', function() {
+          //  var center = map.getCenter();
+          //  cameraSpeed = Math.sqrt(Math.pow(center.lat() - currLoc.lat(), 2) + Math.pow(center.lng() - currLoc.lng(), 2));
+          //  //console.log(Math.pow(center.lat() - currLoc.lat(), 2) + Math.pow(center.lng() - currLoc.lng()));
+          //  console.log(cameraSpeed);
+          //  currLoc = center;
+          //  if (!dragging)
+          //    drawAll();
+          //});
+        }
+        
+        function addPoint() {
+          if (isNaN(txtLat.value) || isNaN(txtLng.value))
+            return;
+          var location = {lat: Number(txtLat.value), lng: Number(txtLng.value)};
+          var request;
+          
+          if (selType.options[selType.selectedIndex].value == 'berangkat') {
+            request = data[0].berangkat[0].request;
+          } else {
+            request = data[0].kembali[0].request;
+          }
+          
+          if (request.destination != null) {
+            request.waypoints.push({location: request.destination, stopover: false});
+            request.destination = null;
+          }
+          if (request.origin == null) {
+            request.origin = location;
+          } else {
+            request.destination = location;
+          }
+          
+          if (selType.options[selType.selectedIndex].value == 'berangkat') {
+            data[0].berangkat[0].request = request;
+          } else {
+            data[0].kembali[0].request = request;
+          }
+          
+          if (request.origin != null && request.destination != null)
+            drawAll();
         }
       </script>
       <script async defer
@@ -252,9 +322,11 @@
       <input type="text" id="txtLat" />
       <input type="text" id="txtLng" />
       <input type="text" id="txtLongCoord" />
-      <select id="selRoute" onchange="drawAll()">
-        <option value="-1" selected>Semua</option>
+      <select id="selType">
+        <option value="berangkat">Berangkat</option>
+        <option value="kembali">Kembali</option>
       </select>
+      <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
     </div>
   </body>
 </html>
