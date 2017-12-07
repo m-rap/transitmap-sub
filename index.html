@@ -20,6 +20,7 @@
     <div style="position: relative;">
       <div id="map"></div>
       <canvas id="renderCanvas"></canvas>
+      <script src="/js/util.js"></script>
       <script src="/data/sub.js"></script>
       <script>
         var currLoc;
@@ -27,7 +28,6 @@
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
         var selRoute;
-        var directionsService;
         var data = null;
         var selected = -1;
         var canvasInitialized = false;
@@ -39,21 +39,6 @@
         var widthRatio;
         var heightRatio;
         var paths = null;
-
-        function getJSON(url, callback) {
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', url, true);
-          xhr.responseType = 'json';
-          xhr.onload = function() {
-            var status = xhr.status;
-            if (status == 200) {
-              callback(null, xhr.response);
-            } else {
-              callback(status, xhr.response);
-            }
-          };
-          xhr.send();
-        };
 
         window.onload = function() {
           selRoute = document.getElementById('selRoute');
@@ -69,89 +54,6 @@
             selRouteOptions += "<option value=\"" + data[a].nama + "\">" + data[a].nama + "</option>";
             //selRouteOptions += "<option value=\"" + a + "\">" + data[a].nama + "</option>";
           selRoute.innerHTML = selRouteOptions;
-        }
-
-        // reference: https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-        function hexToRgb(hex) {
-          // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-          var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-          hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-              return r + r + g + g + b + b;
-          });
-
-          var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-          return result ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          } : null;
-        }
-        
-        function drawDirections(rute, i) {
-          if (i >= rute.length) {
-            //selRoute.disabled = true;
-            //setTimeout(function () { selRoute.disabled = false }, 5000);
-            return;
-          }
-
-          if (typeof(rute[i].renderer) != 'undefined') {
-            if (rute[i].renderer != null) {
-              rute[i].renderer.setMap(null);
-              rute[i].renderer = null;
-            }
-          }
-
-          if (!rute[i].isSelected) {
-            i++;
-            drawDirections(rute, i);
-            return;
-          }
-
-          directionsService.route(rute[i].request, function(response, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-              //console.log(rute[i]);
-              //console.log(response);
-              renderCtx.beginPath();
-              for (k in response.routes) {
-                for (j in response.routes[k].overview_path) {
-                  //console.log(response.routes[k].overview_path[j]);
-                  var latLng = response.routes[k].overview_path[j];
-                  //console.log((latLng.lng() - bounds.getSouthWest().lng()) * widthRatio + ' ' + (latLng.lat() - bounds.getSouthWest().lat()) * heightRatio);
-                  if (j == 0) {
-                    renderCtx.moveTo((latLng.lng() - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio));
-                  } else {
-                    renderCtx.lineTo((latLng.lng() - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio));
-                  }
-                  //var marker = new google.maps.Marker({position: response.routes[0].overview_path[i], map: map});
-                }
-              }
-
-              var polylineOptions = {
-                strokeColor: rute[i].color,
-                strokeWeight: 3
-              };
-
-              if (rute[i].isSelected)
-                polylineOptions.strokeOpacity = 1.0;
-              else
-                polylineOptions.strokeOpacity = 0.2;
-              
-              var rgb = hexToRgb(rute[i].color);
-              
-              renderCtx.lineWidth = polylineOptions.strokeWeight;
-              renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + polylineOptions.strokeOpacity + ')';
-              renderCtx.stroke();
-
-              //rute[i].renderer = new google.maps.DirectionsRenderer({suppressMarkers: true, polylineOptions: polylineOptions, preserveViewport: true});
-              //rute[i].renderer.setMap(map);
-              //rute[i].renderer.setDirections(response);
-
-              i++;
-              drawDirections(rute, i);
-            } else {
-              console.log(i + ' ' + status);
-            }
-          });
         }
         
         function initCanvas() {
@@ -170,12 +72,6 @@
           mapHeight = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
           widthRatio = renderCanvas.width / mapWidth;
           heightRatio = renderCanvas.height / mapHeight;
-          
-          //console.log(mapWidth + ' ' + mapHeight + ' ' + widthRatio + ' ' + heightRatio);
-          
-          //renderCtx.moveTo(0,0);
-          //renderCtx.lineTo(1520,600);
-          //renderCtx.stroke();
         }
 
         function drawAll() {
@@ -190,7 +86,6 @@
           var rute = new Array();
           
           for (a in paths) {
-            //if (data[a].nama != 'G') continue;
             var isSelected = paths[a].nama == selected || selected == -1;
             if (!isSelected)
               continue;
@@ -198,9 +93,6 @@
             renderCtx.beginPath();
             for (i in paths[a].path) {
               var latLng = paths[a].path[i];
-              //console.log(widthRatio);
-              //console.log((latLng.lng - bounds.getSouthWest().lng) * widthRatio);
-              //console.log((latLng.lng - bounds.getSouthWest().lng) * widthRatio + ' ' + renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat) * heightRatio));
               if (i == 0)
                 renderCtx.moveTo((latLng.lng - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat()) * heightRatio));
               else
@@ -211,26 +103,6 @@
             renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)';
             renderCtx.stroke();
           }
-          
-          //selected = Number(selRoute.options[selRoute.selectedIndex].value);
-          //var rute = new Array();
-          //renderCtx.beginPath();
-          //for (a in data) {
-          //  //if (data[a].nama != 'G') continue;
-          //  var isSelected = a == selected || selected == -1;
-          //  console.log(isSelected);
-          //  for (i in data[a].berangkat) {
-          //    data[a].berangkat[i].isSelected = isSelected;
-          //    if (isSelected)
-          //      rute.push(data[a].berangkat[i]);
-          //  }
-          //  for (i in data[a].kembali) {
-          //    data[a].kembali[i].isSelected = isSelected;
-          //    if (isSelected)
-          //      rute.push(data[a].kembali[i]);
-          //  }
-          //}
-          //drawDirections(rute, 0);
         }
 
         function initMap() {
@@ -251,13 +123,7 @@
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
             center: currLoc,
-            styles: [
-              //{
-              //  featureType: 'transit',
-              //  elementType: 'geometry',
-              //  stylers: [{color: '#ff0000'}]
-              //},
-            ]
+            styles: []
           });
           map.addListener('click', function(e) {
             var latLng = e.latLng;
@@ -265,12 +131,6 @@
             txtLng.value = latLng.lng();
             txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
           });
-          //var marker = new google.maps.Marker({
-          //  position: currLoc,
-          //  map: map
-          //});
-
-          directionsService = new google.maps.DirectionsService();
           
           map.addListener('bounds_changed', function() {
             drawAll();

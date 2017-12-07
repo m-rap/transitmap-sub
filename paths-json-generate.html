@@ -18,7 +18,7 @@
           initData();
         }
         
-        function drawDirections(rute, i) {
+        function getRoutes(rute, i) {
           if (i >= rute.length) {
             document.body.innerHTML = JSON.stringify(routes);
             return;
@@ -38,7 +38,7 @@
             }
             
             i++;
-            drawDirections(rute, i);
+            getRoutes(rute, i);
           });
         }
 
@@ -70,7 +70,7 @@
               rute.push(data[a].kembali[i]);
             }
           }
-          drawDirections(rute, 0);
+          getRoutes(rute, 0);
         }
       </script>
       <script async defer
