@@ -15,6 +15,9 @@
         top: 0; right: 0; bottom: 0; left: 0;
         z-index: 10;
       }
+      ul {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -65,12 +68,18 @@
         var heightRatio;
         var cameraSpeed = 0;
         var lastLoc;
+        var radioSelected = null;
+        var listBerangkatUl;
+        var listKembaliUl;
 
         window.onload = function() {
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
-          txtLongCoord = document.getElementById('txtLongCoord');
-          selType = document.getElementById('selType');
+          //txtLongCoord = document.getElementById('txtLongCoord');
+          //selType = document.getElementById('selType');
+          listBerangkatUl = document.getElementById('listBerangkat');
+          listKembaliUl = document.getElementById('listKembali');
+          invalidateList();
         }
         
         function drawDirections(rute, i) {
@@ -167,7 +176,7 @@
             var latLng = e.latLng;
             txtLat.value = latLng.lat();
             txtLng.value = latLng.lng();
-            txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
+            //txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
           });
 
           directionsService = new google.maps.DirectionsService();
@@ -199,16 +208,24 @@
         }
         
         function addPoint() {
+          if (radioSelected == null)
+            return;
+          
           if (isNaN(txtLat.value) || isNaN(txtLng.value))
             return;
           var location = {lat: Number(txtLat.value), lng: Number(txtLng.value)};
-          var request;
           
-          if (selType.options[selType.selectedIndex].value == 'berangkat') {
-            request = berangkat[0].request;
+          var request;
+          if (radioSelected.type == 0) {
+            request = berangkat[radioSelected.idx].request;
           } else {
-            request = kembali[0].request;
+            request = kembali[radioSelected.idx].request;
           }
+          //if (selType.options[selType.selectedIndex].value == 'berangkat') {
+          //  request = berangkat[0].request;
+          //} else {
+          //  request = kembali[0].request;
+          //}
           
           if (request.destination != null) {
             request.waypoints.push({location: request.destination, stopover: false});
@@ -220,14 +237,82 @@
             request.destination = location;
           }
           
-          if (selType.options[selType.selectedIndex].value == 'berangkat') {
-            berangkat[0].request = request;
+          if (radioSelected.type == 0) {
+            berangkat[radioSelected.idx].request = request;
           } else {
-            kembali[0].request = request;
+            kembali[radioSelected.idx].request = request;
           }
           
+          //if (selType.options[selType.selectedIndex].value == 'berangkat') {
+          //  berangkat[0].request = request;
+          //} else {
+          //  kembali[0].request = request;
+          //}
+          
+          invalidateList();
           if (request.origin != null && request.destination != null)
             drawAll();
+        }
+        
+        function addList(type) {
+          var temp;
+          if (type == 0) {
+            temp = berangkat;
+          } else {
+            temp = kembali;
+          }
+          temp.push({
+              request: {
+                origin: null, 
+                destination: null,
+                waypoints: [
+                ],
+                optimizeWaypoints: false
+              },
+              color: '#61bb46'
+            });
+          if (type == 0) {
+            berangkat = temp;
+          } else {
+            kembali = temp;
+          }
+          invalidateList();
+        }
+        
+        function invalidateList() {
+          var ul;
+          var temp = [listBerangkatUl, listKembaliUl];
+          var temp1 = [berangkat, kembali];
+          var temp2 = ['berangkat', 'kembali'];
+          for (a in temp) {
+            ul = temp[a];
+            var htmlStr = "";
+            for (i in temp1[a]) {
+              var checked = ((radioSelected != null) ? (radioSelected.type == a && radioSelected.idx == i) ? "checked" : "" : "");
+              htmlStr += "\n\
+          <li><input name=\"radLoc\" type=\"radio\" onchange=\"radLocOnChange(" + a + ", " + i + ")\" " + checked + "/> " + temp2[a] + " " + (Number(i)+1) +" <input type=\"button\" value=\"Remove\" />\n\
+            <ul id=\"" + temp2[a] + (i) + "\">\n";
+              var waypoints = temp1[a][i].request.waypoints.slice();
+              if (temp1[a][i].request.origin != null) {
+                waypoints.splice(0, 0, {location: temp1[a][i].request.origin, stopover: false});
+              }
+              if (temp1[a][i].request.destination != null) {
+                waypoints.push({location: temp1[a][i].request.destination, stopover: false});
+              }
+              for (j in waypoints) {
+                htmlStr += "\
+              <li>lat: " + waypoints[j].location.lat + ", lng: " + waypoints[j].location.lng + "  <input type=\"button\" value=\"Remove\" /></li>";
+              }
+              htmlStr += "\
+            </ul>\n\
+          </li>";
+            }
+            ul.innerHTML = htmlStr;
+          }
+        }
+        
+        function radLocOnChange(type, idx) {
+          radioSelected = {type: type, idx: idx};
         }
       </script>
       <script async defer
@@ -235,29 +320,21 @@
       </script>
       <input type="text" id="txtLat" />
       <input type="text" id="txtLng" />
-      <input type="text" id="txtLongCoord" />
-      <select id="selType">
+      <!--<input type="text" id="txtLongCoord" />-->
+      <!--<select id="selType">
         <option value="berangkat">Berangkat</option>
         <option value="kembali">Kembali</option>
-      </select>
+      </select>-->
       <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
-      <div id="listBerangkat">
-        <div id="berangkat0">
-          <a href="#">x</a>
-          <div>
-            <input name="radLoc" type="radio" />
-            <div>lat: 0, lng: 0 <a href="#">x</a></div>
-          </div>
-        </div>
+      <div>
+        List berangkat: <input type="button" value="Add" onclick="addList(0)" />
+        <ul id="listBerangkat">
+        </ul>
       </div>
-      <div id="listKembali">
-        <div id="kembali0">
-          <a href="#">x</a>
-          <div>
-            <input name="radLoc" type="radio" />
-            <div>lat: 0, lng: 0 <a href="#">x</a></div>
-          </div>
-        </div>
+      <div>
+        List kembali: <input type="button" value="Add" onclick="addList(1)" />
+        <ul id="listKembali">
+        </ul>
       </div>
     </div>
   </body>
