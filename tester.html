@@ -10,13 +10,16 @@
         max-width: 550px;
        }
       #renderCanvas {
-        //display: block;
         position: absolute;
         top: 0; right: 0; bottom: 0; left: 0;
         z-index: 10;
       }
       ul {
         margin: 0;
+      }
+      code {
+        display: block;
+        white-space: pre-wrap   
       }
     </style>
   </head>
@@ -71,14 +74,14 @@
         var radioSelected = null;
         var listBerangkatUl;
         var listKembaliUl;
+        var jscode;
 
         window.onload = function() {
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
-          //txtLongCoord = document.getElementById('txtLongCoord');
-          //selType = document.getElementById('selType');
           listBerangkatUl = document.getElementById('listBerangkat');
           listKembaliUl = document.getElementById('listKembali');
+          jscode = document.getElementById('jscode');
           invalidateList();
         }
         
@@ -110,10 +113,13 @@
               i++;
               drawDirections(rute, i);
             } else {
-              console.log(i + ' ' + status + '. retrying..');
-              setTimeout(function() {
-                drawDirections(rute, i)
-              }, 2000);
+              console.log(i + ' ' + status);
+              if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                console.log('Retrying..');
+                setTimeout(function() {
+                  drawDirections(rute, i)
+                }, 2000);
+              }
             }
           });
         }
@@ -215,17 +221,9 @@
             return;
           var location = {lat: Number(txtLat.value), lng: Number(txtLng.value)};
           
-          var request;
-          if (radioSelected.type == 0) {
-            request = berangkat[radioSelected.idx].request;
-          } else {
-            request = kembali[radioSelected.idx].request;
-          }
-          //if (selType.options[selType.selectedIndex].value == 'berangkat') {
-          //  request = berangkat[0].request;
-          //} else {
-          //  request = kembali[0].request;
-          //}
+          var request = (radioSelected.type == 0) ?
+              berangkat[radioSelected.idx].request :
+              kembali[radioSelected.idx].request;
           
           if (request.destination != null) {
             request.waypoints.push({location: request.destination, stopover: false});
@@ -236,18 +234,6 @@
           } else {
             request.destination = location;
           }
-          
-          if (radioSelected.type == 0) {
-            berangkat[radioSelected.idx].request = request;
-          } else {
-            kembali[radioSelected.idx].request = request;
-          }
-          
-          //if (selType.options[selType.selectedIndex].value == 'berangkat') {
-          //  berangkat[0].request = request;
-          //} else {
-          //  kembali[0].request = request;
-          //}
           
           invalidateList();
           if (request.origin != null && request.destination != null)
@@ -290,7 +276,7 @@
             for (i in temp1[a]) {
               var checked = ((radioSelected != null) ? (radioSelected.type == a && radioSelected.idx == i) ? "checked" : "" : "");
               htmlStr += "\n\
-          <li><input name=\"radLoc\" type=\"radio\" onchange=\"radLocOnChange(" + a + ", " + i + ")\" " + checked + "/> " + temp2[a] + " " + (Number(i)+1) +" <input type=\"button\" value=\"Remove\" />\n\
+          <li><input name=\"radLoc\" type=\"radio\" onchange=\"radLocOnChange(" + a + ", " + i + ")\" " + checked + "/> " + temp2[a] + " " + (Number(i)+1) +" <input type=\"button\" value=\"Remove\" onclick=\"removeRoute(" + a + ", " + i + ")\" />\n\
             <ul id=\"" + temp2[a] + (i) + "\">\n";
               var waypoints = temp1[a][i].request.waypoints.slice();
               if (temp1[a][i].request.origin != null) {
@@ -301,7 +287,7 @@
               }
               for (j in waypoints) {
                 htmlStr += "\
-              <li>lat: " + waypoints[j].location.lat + ", lng: " + waypoints[j].location.lng + "  <input type=\"button\" value=\"Remove\" /></li>";
+              <li>lat: " + waypoints[j].location.lat + ", lng: " + waypoints[j].location.lng + "  <input type=\"button\" value=\"Remove\" onclick=\"removeLoc(" + a + ", " + i + ", " + j + ")\" /></li>";
               }
               htmlStr += "\
             </ul>\n\
@@ -309,10 +295,89 @@
             }
             ul.innerHTML = htmlStr;
           }
+          generateCode();
         }
         
         function radLocOnChange(type, idx) {
           radioSelected = {type: type, idx: idx};
+        }
+        
+        function removeRoute(type, idx) {
+          if (type == 0) {
+            berangkat.splice(idx, 1);
+          } else {
+            kembali.splice(idx, 1);
+          }
+          radioSelected = null;
+          invalidateList();
+          drawAll();
+        }
+        
+        function removeLoc(type, idx, locIdx) {
+          var request = (type == 0) ? berangkat[idx].request : kembali[idx].request;
+          if (request.origin != null) {
+            request.waypoints.splice(0, 0, {location: request.origin, stopover: false});
+            request.origin = null;
+          }
+          if (request.destination != null) {
+            request.waypoints.push({location: request.destination, stopover: false});
+            request.destination = null;
+          }
+          request.waypoints.splice(locIdx, 1);
+          if (request.waypoints.length > 0) {
+            request.origin = request.waypoints[0].location;
+            request.waypoints.splice(0, 1);
+          }
+          if (request.waypoints.length > 0) {
+            request.destination = request.waypoints[request.waypoints.length - 1].location;
+            request.waypoints.splice(request.waypoints.length - 1, 1);
+          }
+          invalidateList();
+          drawAll();
+        }
+        
+        function locToCode(loc) {
+          if (loc == null)
+            return "null";
+          return "{lat: " + loc.lat + ", lng: " + loc.lng + "}";
+        }
+        
+        function waypointToCode(waypoint) {
+          return "{location: " + locToCode(waypoint.location) + ", stopover: false}";
+        }
+        
+        function routesToCode(routes) {
+          var htmlStr = "";
+          for (i in routes) {
+            var request = routes[i].request;
+            htmlStr += "{\n\
+    request:\n\
+    {\n\
+      origin: " + locToCode(request.origin) + ",\n\
+      destination: " + locToCode(request.destination) + ",\n\
+      waypoints: [\n";
+    for (j in request.waypoints) {
+      htmlStr += "\
+        " + waypointToCode(request.waypoints[j]) + ((j == request.waypoints.length - 1) ? "" : ",") + "\n";
+    }
+    htmlStr += "\
+      ],\n\
+      optimizeWaypoints: false,\n\
+    },\n\
+    color: \"#61bb46\"\n\
+  }" + ((i == routes.length - 1) ? "" : ", ");
+          }
+          return htmlStr;
+        }
+        
+        function generateCode() {
+          var htmlStr = "\
+{\n\
+  nama: \"\",\n\
+  berangkat: [" + routesToCode(berangkat) + "],\n\
+  kembali: [" + routesToCode(kembali) + "]\n\
+}";
+          jscode.innerHTML = htmlStr;
         }
       </script>
       <script async defer
@@ -320,11 +385,6 @@
       </script>
       <input type="text" id="txtLat" />
       <input type="text" id="txtLng" />
-      <!--<input type="text" id="txtLongCoord" />-->
-      <!--<select id="selType">
-        <option value="berangkat">Berangkat</option>
-        <option value="kembali">Kembali</option>
-      </select>-->
       <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
       <div>
         List berangkat: <input type="button" value="Add" onclick="addList(0)" />
@@ -336,6 +396,9 @@
         <ul id="listKembali">
         </ul>
       </div>
+      Code:<br/>
+      <code id="jscode">
+      </code>
     </div>
   </body>
 </html>
