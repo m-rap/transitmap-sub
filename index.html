@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <style>
        #map {
-        height: 600px;
+        height: 800px;
         width: 100%;
        }
       #renderCanvas {
@@ -21,14 +21,12 @@
       <div id="map"></div>
       <canvas id="renderCanvas"></canvas>
       <script src="/js/util.js"></script>
-      <script src="/data/sub.js"></script>
       <script>
         var currLoc;
         var mapDiv;
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
         var selRoute;
-        var data = null;
         var selected = -1;
         var canvasInitialized = false;
         var renderCanvas;
@@ -42,18 +40,21 @@
 
         window.onload = function() {
           selRoute = document.getElementById('selRoute');
-
-          initData();
           
           getJSON('http://dev1-mohammadrianap89797.codeanyapp.com:3000/data/sub-paths.json', function(status, response) {
             paths = response;
+            var labels = [];
+            var selRouteOptions = selRoute.innerHTML;
+            for (i in paths) {
+              if (labels.indexOf(paths[i].nama) == -1) {
+                labels.push(paths[i].nama);
+                selRouteOptions += "<option value=\"" + paths[i].nama + "\">" + paths[i].nama + "</option>";
+              }
+            }
+            selRoute.innerHTML = selRouteOptions;
           });
           
-          var selRouteOptions = selRoute.innerHTML;
-          for (a in data)
-            selRouteOptions += "<option value=\"" + data[a].nama + "\">" + data[a].nama + "</option>";
-            //selRouteOptions += "<option value=\"" + a + "\">" + data[a].nama + "</option>";
-          selRoute.innerHTML = selRouteOptions;
+          
         }
         
         function initCanvas() {
@@ -106,30 +107,12 @@
         }
 
         function initMap() {
-          if (data == null) {
-            setTimeout(initMap, 50);
-            return;
-          }
-
-          for (a in data) {
-            for (i in data[a].berangkat)
-              data[a].berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-            for (i in data[a].kembali)
-              data[a].kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-          }
-
           currLoc = srw;
           mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
             center: currLoc,
             styles: []
-          });
-          map.addListener('click', function(e) {
-            var latLng = e.latLng;
-            txtLat.value = latLng.lat();
-            txtLng.value = latLng.lng();
-            txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
           });
           
           map.addListener('bounds_changed', function() {

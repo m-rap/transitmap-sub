@@ -6,23 +6,30 @@
   </head>
   <body>
     <div style="position: relative;">
-      <div id="map"></div>
-      <canvas id="renderCanvas"></canvas>
+      <div id="status"></div>
+      <div id="code"></div>
       <script src="/data/sub.js"></script>
       <script>
+        var statusDiv;
+        var codeDiv;
         var directionsService;
         var data = null;
         var routes = new Array();
 
         window.onload = function() {
+          statusDiv = document.getElementById('status');
+          codeDiv = document.getElementById('code');
           initData();
         }
         
         function getRoutes(rute, i) {
           if (i >= rute.length) {
-            document.body.innerHTML = JSON.stringify(routes);
+            statusDiv.innerHTML = "done";
+            codeDiv.innerHTML = JSON.stringify(routes);
             return;
           }
+          
+          statusDiv.innerHTML = "requesting " + rute[i].nama;
 
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
@@ -33,12 +40,19 @@
                 }
               }
               routes.push({nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
-            } else {
+              i++;
+              getRoutes(rute, i);
+            }  else {
               console.log(i + ' ' + status);
+              if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                console.log('Retrying..');
+                setTimeout(function() {
+                  getRoutes(rute, i)
+                }, 500);
+              }
             }
             
-            i++;
-            getRoutes(rute, i);
+            
           });
         }
 

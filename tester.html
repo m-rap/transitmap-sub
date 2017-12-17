@@ -4,33 +4,40 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
-       #map {
-        height: 600px;
+      body, html {
+        height: 100%;
+      }
+      #map {
+        height: 800px;
         width: 100%;
-        max-width: 550px;
-       }
+      }
       #renderCanvas {
         position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
         z-index: 10;
+      }
+      #fullTest {
+        position: absolute;
+        top: 0;
+        bottom: 0;
       }
       ul {
         margin: 0;
       }
       code {
         display: block;
-        white-space: pre-wrap   
       }
     </style>
   </head>
   <body>
-    <div style="position: relative;">
-      <div id="map"></div>
+    <div style="position: relative; height: 100%;">
+      <!--<div id="fullTest"></div>-->
       <canvas id="renderCanvas"></canvas>
+      <div id="map"></div>
       <script src="/js/util.js"></script>
       <script>
+        var fullTest;
         var currLoc;
-        var mapDiv;
+        var mapDiv = null;
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
         var dragging = false;
@@ -61,7 +68,6 @@
               color: '#61bb46'
             }];
         var selected = -1;
-        var canvasInitialized = false;
         var renderCanvas;
         var renderCtx = null;
         var bounds;
@@ -75,13 +81,22 @@
         var listBerangkatUl;
         var listKembaliUl;
         var jscode;
+        var retrying = false;
 
         window.onload = function() {
+          //fullTest = document.getElementById('fullTest');
+          renderCanvas = document.getElementById('renderCanvas');
+          renderCanvas.style.pointerEvents = 'none';
+          renderCtx = renderCanvas.getContext('2d');
+          if (mapDiv == null)
+            mapDiv = document.getElementById('map');
+          //mapDiv.style.height = fullTest.clientHeight + 'px';
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
           listBerangkatUl = document.getElementById('listBerangkat');
           listKembaliUl = document.getElementById('listKembali');
           jscode = document.getElementById('jscode');
+          initMap();
           invalidateList();
         }
         
@@ -92,6 +107,7 @@
 
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
+              retrying = false;
               renderCtx.beginPath();
               for (j = 0; j < response.routes[0].overview_path.length; j++) {
                 var latLng = response.routes[0].overview_path[j];
@@ -115,23 +131,17 @@
             } else {
               console.log(i + ' ' + status);
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                retrying = true;
                 console.log('Retrying..');
                 setTimeout(function() {
                   drawDirections(rute, i)
-                }, 2000);
+                }, 500);
               }
             }
           });
         }
         
         function initCanvas() {
-          if (!canvasInitialized) {
-            canvasInitialized = true;
-            renderCanvas = document.getElementById('renderCanvas');
-            renderCanvas.style.pointerEvents = 'none';
-            renderCtx = renderCanvas.getContext('2d');
-          }
-          
           renderCanvas.width = mapDiv.clientWidth;
           renderCanvas.height = mapDiv.clientHeight;
           renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
@@ -143,6 +153,9 @@
         }
 
         function drawAll() {
+          if (retrying)
+            return;
+          
           initCanvas();
           
           for (i in berangkat)
@@ -167,7 +180,8 @@
 
         function initMap() {
           currLoc = srw;
-          mapDiv = document.getElementById('map');
+          if (mapDiv == null)
+            mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
             center: currLoc,
@@ -339,6 +353,8 @@
         function locToCode(loc) {
           if (loc == null)
             return "null";
+          if (typeof loc == "string")
+            return loc;
           return "{lat: " + loc.lat + ", lng: " + loc.lng + "}";
         }
         
@@ -377,11 +393,19 @@
   berangkat: [" + routesToCode(berangkat) + "],\n\
   kembali: [" + routesToCode(kembali) + "]\n\
 }";
-          jscode.innerHTML = htmlStr;
+          jscode.value = htmlStr;
+        }
+        
+        function importCode() {
+          eval("var parsed = " + jscode.value);
+          berangkat = parsed.berangkat;
+          kembali = parsed.kembali;
+          invalidateList();
+          drawAll();
         }
       </script>
       <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=initMap">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg">
       </script>
       <input type="text" id="txtLat" />
       <input type="text" id="txtLng" />
@@ -397,8 +421,10 @@
         </ul>
       </div>
       Code:<br/>
-      <code id="jscode">
-      </code>
+      <textarea id="jscode" cols="160" rows="30"></textarea><br />
+      <input type="button" value="Import" onclick="importCode()" />
+      <br />
+      <br />
     </div>
   </body>
 </html>
