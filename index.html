@@ -27,6 +27,7 @@
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
         var selRoute;
+        var selMode;
         var selected = -1;
         var canvasInitialized = false;
         var renderCanvas;
@@ -40,6 +41,7 @@
 
         window.onload = function() {
           selRoute = document.getElementById('selRoute');
+          selMode = document.getElementById('selMode');
           
           getJSON('http://dev1-mohammadrianap89797.codeanyapp.com:3000/data/sub-paths.json', function(status, response) {
             paths = response;
@@ -84,11 +86,16 @@
           initCanvas();
           
           selected = selRoute.options[selRoute.selectedIndex].value;
+          var selectedMode = selMode.options[selMode.selectedIndex].value;
           var rute = new Array();
           
           for (a in paths) {
             var isSelected = paths[a].nama == selected || selected == -1;
             if (!isSelected)
+              continue;
+            
+            if ((selectedMode == 0 && paths[a].tipe == "kembali") ||
+                (selectedMode == 1 && paths[a].tipe == "berangkat"))
               continue;
             
             renderCtx.beginPath();
@@ -127,8 +134,13 @@
       <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=initMap">
       </script>
-      <select id="selRoute" onchange="drawAll()">
+      Rute: <select id="selRoute" onchange="drawAll()">
         <option value="-1" selected>Semua</option>
+      </select> 
+      Tipe: <select id="selMode" onchange="drawAll()">
+        <option value="-1" selected>Semua</option>
+        <option value="0">Berangkat</option>
+        <option value="1">Kembali</option>
       </select>
     </div>
   </body>
