@@ -82,6 +82,7 @@
         var listKembaliUl;
         var jscode;
         var retrying = false;
+        var statusSpan;
 
         window.onload = function() {
           //fullTest = document.getElementById('fullTest');
@@ -93,17 +94,22 @@
           //mapDiv.style.height = fullTest.clientHeight + 'px';
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
+          txtLongCoord = document.getElementById('txtLongCoord');
           listBerangkatUl = document.getElementById('listBerangkat');
           listKembaliUl = document.getElementById('listKembali');
           jscode = document.getElementById('jscode');
+          statusSpan = document.getElementById('status');
           initMap();
           invalidateList();
         }
         
         function drawDirections(rute, i) {
           if (i >= rute.length) {
+            statusSpan.innerHTML = "Status: Ready";
             return;
           }
+          
+          statusSpan.innerHTML = "Status: Requesting route " + (i + 1);
 
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
@@ -129,7 +135,7 @@
               i++;
               drawDirections(rute, i);
             } else {
-              console.log(i + ' ' + status);
+              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1);
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                 retrying = true;
                 console.log('Retrying..');
@@ -196,7 +202,7 @@
             var latLng = e.latLng;
             txtLat.value = latLng.lat();
             txtLng.value = latLng.lng();
-            //txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
+            txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
           });
 
           directionsService = new google.maps.DirectionsService();
@@ -409,7 +415,10 @@
       </script>
       <input type="text" id="txtLat" />
       <input type="text" id="txtLng" />
+      <input type="text" id="txtLongCoord" style="width: 300px;" />
       <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
+      <input type="button" value="Refresh" onclick="drawAll()" />
+      <span id="status"></span>
       <div>
         List berangkat: <input type="button" value="Add" onclick="addList(0)" />
         <ul id="listBerangkat">
