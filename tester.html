@@ -44,6 +44,7 @@
         var txtLat;
         var txtLng;
         var txtLongCoord;
+        var txtName;
         var selType;
         var directionsService;
         var berangkat =
@@ -95,6 +96,7 @@
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
           txtLongCoord = document.getElementById('txtLongCoord');
+          txtName = document.getElementById('txtName');
           listBerangkatUl = document.getElementById('listBerangkat');
           listKembaliUl = document.getElementById('listKembali');
           jscode = document.getElementById('jscode');
@@ -135,10 +137,9 @@
               i++;
               drawDirections(rute, i);
             } else {
-              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1);
+              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ". Retrying...";
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                 retrying = true;
-                console.log('Retrying..');
                 setTimeout(function() {
                   drawDirections(rute, i)
                 }, 500);
@@ -173,10 +174,16 @@
           for (i in berangkat) {
             if (berangkat[i].request.origin == null || berangkat[i].request.destination == null)
               continue;
+            var checkbox = document.getElementById("seldraw_0_" + i);
+            if (checkbox != null && !checkbox.checked)
+              continue;
             rute.push(berangkat[i]);
           }
           for (i in kembali) {
             if (kembali[i].request.origin == null || kembali[i].request.destination == null)
+              continue;
+            var checkbox = document.getElementById("seldraw_1_" + i);
+            if (checkbox != null && !checkbox.checked)
               continue;
             rute.push(kembali[i]);
           }
@@ -202,7 +209,7 @@
             var latLng = e.latLng;
             txtLat.value = latLng.lat();
             txtLng.value = latLng.lng();
-            txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '} // ';
+            txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '}';
           });
 
           directionsService = new google.maps.DirectionsService();
@@ -295,8 +302,14 @@
             var htmlStr = "";
             for (i in temp1[a]) {
               var checked = ((radioSelected != null) ? (radioSelected.type == a && radioSelected.idx == i) ? "checked" : "" : "");
+              var seldrawChecked = true;
+              var checkbox = document.getElementById("seldraw_" + a + "_" + i);
+              if (checkbox != null && !checkbox.checked)
+                seldrawChecked = false;
               htmlStr += "\n\
           <li><input name=\"radLoc\" type=\"radio\" onchange=\"radLocOnChange(" + a + ", " + i + ")\" " + checked + "/> " + temp2[a] + " " + (Number(i)+1) +" <input type=\"button\" value=\"Remove\" onclick=\"removeRoute(" + a + ", " + i + ")\" />\n\
+            <input id=\"txtColor_" + a + "_" + i + "\" type=\"text\" value=\"" + temp1[a][i].color + "\" style=\"width: 60px;\">\n\
+            <input id=\"seldraw_" + a + "_" + i + "\" type=\"checkbox\" onchange=\"drawAll()\" " + ((seldrawChecked) ? "checked" : "") + "> Draw\n\
             <ul id=\"" + temp2[a] + (i) + "\">\n";
               var waypoints = temp1[a][i].request.waypoints.slice();
               if (temp1[a][i].request.origin != null) {
@@ -386,7 +399,7 @@
       ],\n\
       optimizeWaypoints: false,\n\
     },\n\
-    color: \"#61bb46\"\n\
+    color: \"" + routes[i].color + "\"\n\
   }" + ((i == routes.length - 1) ? "" : ", ");
           }
           return htmlStr;
@@ -395,7 +408,7 @@
         function generateCode() {
           var htmlStr = "\
 {\n\
-  nama: \"\",\n\
+  nama: \"" + txtName.value + "\",\n\
   berangkat: [" + routesToCode(berangkat) + "],\n\
   kembali: [" + routesToCode(kembali) + "]\n\
 }";
@@ -409,6 +422,19 @@
           invalidateList();
           drawAll();
         }
+        
+        function saveInputs() {
+          var temp = [berangkat, kembali];
+          for (i in temp) {
+            for (j in temp[i]) {
+              var txtColor = document.getElementById("txtColor_" + i + "_" + j);
+              if (txtColor == null)
+                continue;
+              temp[i][j].color = txtColor.value;
+            }
+          }
+          invalidateList();
+        }
       </script>
       <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg">
@@ -418,16 +444,16 @@
       <input type="text" id="txtLongCoord" style="width: 300px;" />
       <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
       <input type="button" value="Refresh" onclick="drawAll()" />
-      <span id="status"></span>
+      <span id="status"></span><br /><br />
       <div>
-        List berangkat: <input type="button" value="Add" onclick="addList(0)" />
+        Nama: <input id="txtName" type="text" /><br />
+        List berangkat: <input id="txtBerangkatColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addList(0)" />
         <ul id="listBerangkat">
         </ul>
-      </div>
-      <div>
-        List kembali: <input type="button" value="Add" onclick="addList(1)" />
+        List kembali: <input id="txtKembaliColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addList(1)" />
         <ul id="listKembali">
         </ul>
+        <input type="button" value="Save" onclick="saveInputs()" /><br />
       </div>
       Code:<br/>
       <textarea id="jscode" cols="160" rows="30"></textarea><br />

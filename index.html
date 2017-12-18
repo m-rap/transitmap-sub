@@ -27,7 +27,7 @@
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
         var selRoute;
-        var selMode;
+        var selTipe;
         var selected = -1;
         var canvasInitialized = false;
         var renderCanvas;
@@ -41,7 +41,7 @@
 
         window.onload = function() {
           selRoute = document.getElementById('selRoute');
-          selMode = document.getElementById('selMode');
+          selTipe = document.getElementById('selTipe');
           
           getJSON('http://dev1-mohammadrianap89797.codeanyapp.com:3000/data/sub-paths.json', function(status, response) {
             paths = response;
@@ -86,7 +86,7 @@
           initCanvas();
           
           selected = selRoute.options[selRoute.selectedIndex].value;
-          var selectedMode = selMode.options[selMode.selectedIndex].value;
+          var selectedMode = selTipe.options[selTipe.selectedIndex].value;
           var rute = new Array();
           
           for (a in paths) {
@@ -137,7 +137,7 @@
       Rute: <select id="selRoute" onchange="drawAll()">
         <option value="-1" selected>Semua</option>
       </select> 
-      Tipe: <select id="selMode" onchange="drawAll()">
+      Tipe: <select id="selTipe" onchange="drawAll()">
         <option value="-1" selected>Semua</option>
         <option value="0">Berangkat</option>
         <option value="1">Kembali</option>
