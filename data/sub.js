@@ -434,37 +434,37 @@ function initData() {
           },
           color: "#d45500"
         }]
-      },
-      {
-        nama: 'V',
+      }, {
+        nama: "V",
         berangkat: [{
-          request: {
-            origin: 'Terminal Joyoboyo', 
-            destination: 'Jl. Tambak Rejo',
+          request:
+          {
+            origin: {lat: -7.298465693557393, lng: 112.73704290390015},
+            destination: "Jl. Tambak Rejo",
             waypoints: [
-              {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false}, // wijaya kusuma
-              {location: {lat: -7.248674756201677, lng: 112.75976657867432}, stopover: false}, // tambak segaran wetan
+              {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false},
+              {location: {lat: -7.248674756201677, lng: 112.75976657867432}, stopover: false}
             ],
-            optimizeWaypoints: false
+            optimizeWaypoints: false,
           },
-          color: '#eeb211'
+          color: "#eeb211"
         }],
         kembali: [{
-          request: {
-            origin: 'Jl. Tambak Rejo', 
-            destination: 'Terminal Joyoboyo',
+          request:
+          {
+            origin: "Jl. Tambak Rejo",
+            destination: {lat: -7.298468354034732, lng: 112.7370348572731},
             waypoints: [
-              {location: {lat: -7.246806890071356, lng: 112.75890290737152}, stopover: false}, // tambak segaran
-              {location: {lat: -7.24837674958899, lng: 112.76243805885315}, stopover: false}, // rangkah besar
-              {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false}, // wijaya kusuma
-              {location: {lat: -7.307239861748596, lng: 112.73531019687653}, stopover: false}, // putar balik
+              {location: {lat: -7.246806890071356, lng: 112.75890290737152}, stopover: false},
+              {location: {lat: -7.24837674958899, lng: 112.76243805885315}, stopover: false},
+              {location: {lat: -7.259998861325057, lng: 112.7487587928772}, stopover: false},
+              {location: {lat: -7.307239861748596, lng: 112.73531019687653}, stopover: false}
             ],
-            optimizeWaypoints: false
+            optimizeWaypoints: false,
           },
-          color: '#eeb211'
-        }],
-      },
-      {
+          color: "#eeb211"
+        }]
+      }, {
         nama: 'BM',
         berangkat: [{
           request: {

@@ -320,7 +320,7 @@
               }
               for (j in waypoints) {
                 htmlStr += "\
-              <li>lat: " + waypoints[j].location.lat + ", lng: " + waypoints[j].location.lng + "  <input type=\"button\" value=\"Remove\" onclick=\"removeLoc(" + a + ", " + i + ", " + j + ")\" /></li>";
+              <li>" + locToCode(waypoints[j].location) + " <input type=\"button\" value=\"Remove\" onclick=\"removeLoc(" + a + ", " + i + ", " + j + ")\" /></li>";
               }
               htmlStr += "\
             </ul>\n\
@@ -373,7 +373,7 @@
           if (loc == null)
             return "null";
           if (typeof loc == "string")
-            return loc;
+            return "\"" + loc + "\"";
           return "{lat: " + loc.lat + ", lng: " + loc.lng + "}";
         }
         
