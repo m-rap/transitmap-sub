@@ -516,6 +516,111 @@ function initData() {
           color: "#ffaaee"
         }]
       }, {
+        nama: "O",
+        berangkat: [{
+          request:
+          {
+            origin: {lat: -7.22379584760168, lng: 112.73791998624802},
+            destination: {lat: -7.248443268939278, lng: 112.74693489074707},
+            waypoints: [
+              {location: {lat: -7.235658069438647, lng: 112.73817747831345}, stopover: false},
+              {location: {lat: -7.23698317042693, lng: 112.73791193962097}, stopover: false},
+              {location: {lat: -7.241224531761072, lng: 112.73771613836288}, stopover: false},
+              {location: {lat: -7.24732840333142, lng: 112.74039566516876}, stopover: false},
+              {location: {lat: -7.248727971647482, lng: 112.74197280406952}, stopover: false},
+              {location: {lat: -7.252096496571148, lng: 112.74006843566895}, stopover: false},
+              {location: {lat: -7.2522827491888116, lng: 112.74433583021164}, stopover: false},
+              {location: {lat: -7.248312891003488, lng: 112.74666398763657}, stopover: false}
+            ],
+            optimizeWaypoints: false,
+          },
+          color: "#fddc28"
+        }, {
+          request:
+          {
+            origin: {lat: -7.248366106492041, lng: 112.74699121713638},
+            destination: {lat: -7.294695781282922, lng: 112.8015848994255},
+            waypoints: [
+              {location: {lat: -7.248597593794096, lng: 112.74774491786957}, stopover: false},
+              {location: {lat: -7.248938172596954, lng: 112.7511379122734}, stopover: false},
+              {location: {lat: -7.2491004795920855, lng: 112.75619387626648}, stopover: false},
+              {location: {lat: -7.251974101951867, lng: 112.76739478111267}, stopover: false},
+              {location: {lat: -7.256188714902815, lng: 112.76510953903198}, stopover: false},
+              {location: {lat: -7.260807715071837, lng: 112.75861859321594}, stopover: false},
+              {location: {lat: -7.26570337774551, lng: 112.75739014148712}, stopover: false},
+              {location: {lat: -7.26702306899397, lng: 112.77014136314392}, stopover: false},
+              {location: {lat: -7.270173284045125, lng: 112.7739930152893}, stopover: false},
+              {location: {lat: -7.281017943185355, lng: 112.77648210525513}, stopover: false},
+              {location: {lat: -7.2822258453239295, lng: 112.77862250804901}, stopover: false},
+              {location: {lat: -7.276138411124759, lng: 112.78118133544922}, stopover: false},
+              {location: {lat: -7.2819491455618905, lng: 112.78134763240814}, stopover: false},
+              {location: {lat: -7.282843098023932, lng: 112.78559625148773}, stopover: false},
+              {location: {lat: -7.289936121918988, lng: 112.78591811656952}, stopover: false}
+            ],
+            optimizeWaypoints: false,
+          },
+          color: "#fddc28"
+        }],
+        kembali: [{
+          request:
+          {
+            origin: {lat: -7.294693120783153, lng: 112.80157953500748},
+            destination: {lat: -7.2819917147671624, lng: 112.78577327728271},
+            waypoints: [
+              {location: {lat: -7.2902899720082495, lng: 112.79951691627502}, stopover: false},
+              {location: {lat: -7.2885898927087345, lng: 112.78464674949646}, stopover: false}
+            ],
+            optimizeWaypoints: false,
+          },
+          color: "#fddc28"
+        }, {
+          request:
+          {
+            origin: {lat: -7.281983733041479, lng: 112.78571963310242},
+            destination: {lat: -7.236775624746017, lng: 112.73367404937744},
+            waypoints: [
+              {location: {lat: -7.281989054191952, lng: 112.78360068798065}, stopover: false},
+              {location: {lat: -7.2823136442512, lng: 112.77888000011444}, stopover: false},
+              {location: {lat: -7.280632158777156, lng: 112.77602076530457}, stopover: false},
+              {location: {lat: -7.279134247894802, lng: 112.77221202850342}, stopover: false},
+              {location: {lat: -7.266927285082179, lng: 112.76934742927551}, stopover: false},
+              {location: {lat: -7.267278492658881, lng: 112.76087164878845}, stopover: false},
+              {location: {lat: -7.2706096296581215, lng: 112.75962173938751}, stopover: false},
+              {location: {lat: -7.26546657789768, lng: 112.76028424501419}, stopover: false},
+              {location: {lat: -7.259025042055246, lng: 112.75703340768814}, stopover: false},
+              {location: {lat: -7.256569198851906, lng: 112.75878757238388}, stopover: false},
+              {location: {lat: -7.2580831492804, lng: 112.7631139755249}, stopover: false},
+              {location: {lat: -7.254390059152299, lng: 112.7656888961792}, stopover: false},
+              {location: {lat: -7.249792279243336, lng: 112.76265263557434}, stopover: false},
+              {location: {lat: -7.250367004299367, lng: 112.75549650192261}, stopover: false},
+              {location: {lat: -7.256146143252128, lng: 112.75342583656311}, stopover: false},
+              {location: {lat: -7.255427746039496, lng: 112.75023400783539}, stopover: false},
+              {location: {lat: -7.248951476451207, lng: 112.7494615316391}, stopover: false},
+              {location: {lat: -7.248217103108245, lng: 112.74616241455078}, stopover: false},
+              {location: {lat: -7.247637053752012, lng: 112.74137735366821}, stopover: false},
+              {location: {lat: -7.247253901474076, lng: 112.73802995681763}, stopover: false},
+              {location: {lat: -7.24667385087777, lng: 112.73690342903137}, stopover: false},
+              {location: {lat: -7.243193531621063, lng: 112.73491859436035}, stopover: false},
+              {location: {lat: -7.241426753764524, lng: 112.73366332054138}, stopover: false}
+            ],
+            optimizeWaypoints: false,
+          },
+          color: "#fddc28"
+        }, {
+          request:
+          {
+            origin: {lat: -7.236764981375195, lng: 112.73368209600449},
+            destination: {lat: -7.223782543005734, lng: 112.73790657520294},
+            waypoints: [
+              {location: {lat: -7.236027927334886, lng: 112.73288816213608}, stopover: false},
+              {location: {lat: -7.235817720366293, lng: 112.73640185594559}, stopover: false},
+              {location: {lat: -7.231320864299347, lng: 112.7380245923996}, stopover: false}
+            ],
+            optimizeWaypoints: false,
+          },
+          color: "#fddc28"
+        }]
+      }, {
         nama: "Q",
         berangkat: [{
           request:

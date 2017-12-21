@@ -83,6 +83,7 @@
         var listKembaliUl;
         var jscode;
         var retrying = false;
+        var stopRetry = false;
         var statusSpan;
 
         window.onload = function() {
@@ -115,6 +116,12 @@
 
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
+              if (retrying && stopRetry) {
+                retrying = false;
+                stopRetry = false;
+                return;
+              }
+                
               retrying = false;
               renderCtx.beginPath();
               for (j = 0; j < response.routes[0].overview_path.length; j++) {
@@ -139,6 +146,10 @@
             } else {
               statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ". Retrying...";
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                if (retrying && stopRetry) {
+                  retrying = false;
+                  stopRetry = false;
+                }
                 retrying = true;
                 setTimeout(function() {
                   drawDirections(rute, i)
@@ -160,8 +171,11 @@
         }
 
         function drawAll() {
-          if (retrying)
+          if (retrying) {
+            stopRetry = true;
+            setTimeout(drawAll(), 500);
             return;
+          }
           
           initCanvas();
           
@@ -269,10 +283,13 @@
         
         function addList(type) {
           var temp;
+          var txtEl;
           if (type == 0) {
             temp = berangkat;
+            txtEl = document.getElementById('txtBerangkatColor');
           } else {
             temp = kembali;
+            txtEl = document.getElementById('txtKembaliColor');
           }
           temp.push({
               request: {
@@ -282,7 +299,7 @@
                 ],
                 optimizeWaypoints: false
               },
-              color: '#61bb46'
+              color: txtEl.value
             });
           if (type == 0) {
             berangkat = temp;
@@ -417,6 +434,7 @@
         
         function importCode() {
           eval("var parsed = " + jscode.value);
+          txtName.value = parsed.nama;
           berangkat = parsed.berangkat;
           kembali = parsed.kembali;
           invalidateList();
