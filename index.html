@@ -43,7 +43,7 @@
           selRoute = document.getElementById('selRoute');
           selTipe = document.getElementById('selTipe');
           
-          getJSON('http://dev1-mohammadrianap89797.codeanyapp.com:3000/data/sub-paths.json', function(status, response) {
+          getJSON('/data/sub-paths.json', function(status, response) {
             paths = response;
             var labels = [];
             var selRouteOptions = selRoute.innerHTML;
