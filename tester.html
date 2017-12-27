@@ -144,12 +144,14 @@
               i++;
               drawDirections(rute, i);
             } else {
-              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ". Retrying...";
+              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                 if (retrying && stopRetry) {
                   retrying = false;
                   stopRetry = false;
+                  return;
                 }
+                statusSpan.innerHTML +=  " Retrying...";
                 retrying = true;
                 setTimeout(function() {
                   drawDirections(rute, i)
