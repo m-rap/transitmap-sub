@@ -4,22 +4,29 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
-       #map {
-        height: 800px;
+      body, html {
+        height: 100%;
+        margin: 0;
+      }
+      #map {
+        /*height: 800px;*/
         width: 100%;
-       }
+        height: 100%;
+      }
       #renderCanvas {
-        //display: block;
         position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
+        top: 0;
+        left: 0;
         z-index: 10;
+      }
+      #botPane {
+        padding: 6px;
       }
     </style>
   </head>
   <body>
-    <div style="position: relative;">
+    <div style="position: relative; height: 100%;">
       <div id="map"></div>
-      <canvas id="renderCanvas"></canvas>
       <script src="/js/util.js"></script>
       <script>
         var currLoc;
@@ -38,11 +45,19 @@
         var widthRatio;
         var heightRatio;
         var paths = null;
+        var botPane;
+        var mapResized = false;
+        var mapCalledback = false;
 
         window.onload = function() {
+          botPane = document.getElementById('botPane');
+          mapDiv = document.getElementById('map');
+          mapDiv.style.height = (mapDiv.clientHeight - botPane.clientHeight) + 'px';
+          mapResized = true;
+          initMap();
+          
           selRoute = document.getElementById('selRoute');
           selTipe = document.getElementById('selTipe');
-          
           getJSON('/data/sub-paths.json', function(status, response) {
             paths = response;
             var labels = [];
@@ -55,14 +70,21 @@
             }
             selRoute.innerHTML = selRouteOptions;
           });
-          
-          
         }
         
         function initCanvas() {
           if (!canvasInitialized) {
             canvasInitialized = true;
-            renderCanvas = document.getElementById('renderCanvas');
+            renderCanvas = document.createElement('canvas');
+            renderCanvas.id = 'renderCanvas';
+            var mapInnerDiv = document.getElementsByClassName('gm-style')[0].childNodes;
+            for (i in mapInnerDiv) {
+              if (mapInnerDiv[i].tabIndex == 0) {
+                mapInnerDiv = mapInnerDiv[i];
+                break;
+              }
+            }
+            mapInnerDiv.appendChild(renderCanvas);
             renderCanvas.style.pointerEvents = 'none';
             renderCtx = renderCanvas.getContext('2d');
           }
@@ -114,6 +136,9 @@
         }
 
         function initMap() {
+          if (!mapResized || !mapCalledback)
+            return;
+          
           currLoc = srw;
           mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
@@ -130,18 +155,25 @@
             drawAll();
           });
         }
+        
+        function mapCallback() {
+          mapCalledback = true;
+          initMap();
+        }
       </script>
       <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=initMap">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=mapCallback">
       </script>
-      Rute: <select id="selRoute" onchange="drawAll()">
-        <option value="-1" selected>Semua</option>
-      </select> 
-      Tipe: <select id="selTipe" onchange="drawAll()">
-        <option value="-1" selected>Semua</option>
-        <option value="0">Berangkat</option>
-        <option value="1">Kembali</option>
-      </select>
+      <div id="botPane">
+        Rute: <select id="selRoute" onchange="drawAll()">
+          <option value="-1" selected>Semua</option>
+        </select> 
+        Tipe: <select id="selTipe" onchange="drawAll()">
+          <option value="-1" selected>Semua</option>
+          <option value="0">Berangkat</option>
+          <option value="1">Kembali</option>
+        </select>
+      </div>
     </div>
   </body>
 </html>
