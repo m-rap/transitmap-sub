@@ -27,12 +27,16 @@
       code {
         display: block;
       }
+      #botPane {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
       #botPane, #detailPane {
         padding: 6px;
       }
       #detailPane {
         height: 500px;
-        max-height: 40%;
+        max-height: 25%;
         overflow: auto;
         line-height: 140%;
       }
@@ -50,7 +54,6 @@
         var mapDiv = null;
         var map;
         var srw = {lat: -7.279860921538657, lng: 112.74188160896301};
-        var dragging = false;
         var txtLat;
         var txtLng;
         var txtLongCoord;
@@ -100,6 +103,9 @@
         var mapResized = false;
         var mapCalledback = false;
         var canvasInitialized = false;
+        var moving = false;
+        var prevMoving = false;
+        var centerCounter = 0;
         
         window.onload = function() {
           botPane = document.getElementById('botPane');
@@ -239,6 +245,16 @@
           if (rute.length > 0)
             drawDirections(rute, 0);
         }
+        
+        function centerCount() {
+          if (centerCounter == 0) {
+            centerCounter = 0;
+            drawAll();
+            return;
+          }
+          centerCounter--;
+          setTimeout(centerCount, 500);
+        }
 
         function initMap() {
           if (!mapResized || !mapCalledback)
@@ -264,30 +280,48 @@
 
           directionsService = new google.maps.DirectionsService();
           
-          map.addListener('dragstart', function() {
-            dragging = true;
-            if (renderCtx != null)
-              renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+          //map.addListener('dragstart', function() {
+          //  if (renderCtx != null)
+          //    renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+          //});
+          //
+          //map.addListener('dragend', function() {
+          //  drawAll();
+          //});
+          
+          map.addListener('zoom_changed', function() {
+            drawAll();
           });
           
-          map.addListener('dragend', function() {
-            dragging = false;
-          });
-          
-          setInterval(function() {
-            var center = map.getCenter();
-            cameraSpeed = Math.sqrt(Math.pow(center.lat() - currLoc.lat(), 2) + Math.pow(center.lng() - currLoc.lng(), 2));
-            currLoc = center;
-            if (cameraSpeed === 0.0) {
-              if (currLoc.lat() != lastLoc.lat() || currLoc.lng() != lastLoc.lng()) {
-                drawAll();
-                lastLoc = currLoc;
-              }
-            } else {
+          map.addListener('center_changed', function() {
+            var start = false;
+            if (centerCounter == 0)
+              start = true;
+            centerCounter = 2;
+            if (start) {
               if (renderCtx != null)
                 renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+              centerCount();
             }
-          }, 100);
+          });
+          
+          //setInterval(function() {
+          //  var center = map.getCenter();
+          //  moving = false;
+          //  if (center.lat() != currLoc.lat() || center.lng() != currLoc.lng())
+          //    moving = true;
+          //  currLoc = center;
+          //  if (!moving) {
+          //    if (currLoc.lat() != lastLoc.lat() || currLoc.lng() != lastLoc.lng()) {
+          //      drawAll();
+          //      lastLoc = currLoc;
+          //    }
+          //  } else {
+          //    if (renderCtx != null && !prevMoving)
+          //      renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+          //  }
+          //  prevMoving = moving;
+          //}, 500);
         }
         
         function addPoint() {
@@ -499,8 +533,8 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=mapCallback">
       </script>
       <div id="botPane">
-        <input type="text" id="txtLat" />
-        <input type="text" id="txtLng" />
+        <input type="hidden" id="txtLat" />
+        <input type="hidden" id="txtLng" />
         <input type="text" id="txtLongCoord" style="width: 300px;" />
         <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
         <input type="button" value="Refresh" onclick="drawAll()" />
