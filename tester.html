@@ -6,9 +6,10 @@
     <style>
       body, html {
         height: 100%;
+        margin: 0;
       }
       #map {
-        height: 800px;
+        height: 100%;
         width: 100%;
       }
       #renderCanvas {
@@ -25,6 +26,15 @@
       }
       code {
         display: block;
+      }
+      #botPane, #detailPane {
+        padding: 6px;
+      }
+      #detailPane {
+        height: 500px;
+        max-height: 40%;
+        overflow: auto;
+        line-height: 140%;
       }
     </style>
   </head>
@@ -85,14 +95,21 @@
         var retrying = false;
         var stopRetry = false;
         var statusSpan;
-
+        var botPane;
+        var detailPane;
+        var mapResized = false;
+        var mapCalledback = false;
+        var canvasInitialized = false;
+        
         window.onload = function() {
+          botPane = document.getElementById('botPane');
+          detailPane = document.getElementById('detailPane');
+          mapDiv = document.getElementById('map');
+          mapDiv.style.height = (mapDiv.clientHeight - botPane.clientHeight - detailPane.clientHeight) + 'px';
+          mapResized = true;
+          initMap();
+          
           //fullTest = document.getElementById('fullTest');
-          renderCanvas = document.getElementById('renderCanvas');
-          renderCanvas.style.pointerEvents = 'none';
-          renderCtx = renderCanvas.getContext('2d');
-          if (mapDiv == null)
-            mapDiv = document.getElementById('map');
           //mapDiv.style.height = fullTest.clientHeight + 'px';
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
@@ -102,7 +119,7 @@
           listKembaliUl = document.getElementById('listKembali');
           jscode = document.getElementById('jscode');
           statusSpan = document.getElementById('status');
-          initMap();
+          
           invalidateList();
         }
         
@@ -162,6 +179,22 @@
         }
         
         function initCanvas() {
+          if (!canvasInitialized) {
+            canvasInitialized = true;
+            renderCanvas = document.createElement('canvas');
+            renderCanvas.id = 'renderCanvas';
+            var mapInnerDiv = document.getElementsByClassName('gm-style')[0].childNodes;
+            for (i in mapInnerDiv) {
+              if (mapInnerDiv[i].tabIndex == 0) {
+                mapInnerDiv = mapInnerDiv[i];
+                break;
+              }
+            }
+            mapInnerDiv.appendChild(renderCanvas);
+            renderCanvas.style.pointerEvents = 'none';
+            renderCtx = renderCanvas.getContext('2d');
+          }
+          
           renderCanvas.width = mapDiv.clientWidth;
           renderCanvas.height = mapDiv.clientHeight;
           renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
@@ -208,9 +241,10 @@
         }
 
         function initMap() {
+          if (!mapResized || !mapCalledback)
+            return;
+          
           currLoc = srw;
-          if (mapDiv == null)
-            mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
             center: currLoc,
@@ -455,17 +489,24 @@
           }
           invalidateList();
         }
+        
+        function mapCallback() {
+          mapCalledback = true;
+          initMap();
+        }
       </script>
       <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=mapCallback">
       </script>
-      <input type="text" id="txtLat" />
-      <input type="text" id="txtLng" />
-      <input type="text" id="txtLongCoord" style="width: 300px;" />
-      <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
-      <input type="button" value="Refresh" onclick="drawAll()" />
-      <span id="status"></span><br /><br />
-      <div>
+      <div id="botPane">
+        <input type="text" id="txtLat" />
+        <input type="text" id="txtLng" />
+        <input type="text" id="txtLongCoord" style="width: 300px;" />
+        <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
+        <input type="button" value="Refresh" onclick="drawAll()" />
+        <span id="status"></span>
+      </div>
+      <div id="detailPane">
         Nama: <input id="txtName" type="text" /><br />
         List berangkat: <input id="txtBerangkatColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addList(0)" />
         <ul id="listBerangkat">
@@ -474,12 +515,12 @@
         <ul id="listKembali">
         </ul>
         <input type="button" value="Save" onclick="saveInputs()" /><br />
+        Code:<br/>
+        <textarea id="jscode" cols="80" rows="30"></textarea><br />
+        <input type="button" value="Import" onclick="importCode()" />
+        <br />
+        <br />
       </div>
-      Code:<br/>
-      <textarea id="jscode" cols="160" rows="30"></textarea><br />
-      <input type="button" value="Import" onclick="importCode()" />
-      <br />
-      <br />
     </div>
   </body>
 </html>
