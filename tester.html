@@ -16,11 +16,6 @@
         position: absolute;
         z-index: 10;
       }
-      #fullTest {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-      }
       ul {
         margin: 0;
       }
@@ -32,11 +27,14 @@
         white-space: nowrap;
       }
       #botPane, #detailPane {
+        position: absolute;
         padding: 6px;
       }
       #detailPane {
-        height: 500px;
-        max-height: 25%;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 300px;
         overflow: auto;
         line-height: 140%;
       }
@@ -44,12 +42,10 @@
   </head>
   <body>
     <div style="position: relative; height: 100%;">
-      <!--<div id="fullTest"></div>-->
       <canvas id="renderCanvas"></canvas>
       <div id="map"></div>
       <script src="/js/util.js"></script>
       <script>
-        var fullTest;
         var currLoc;
         var mapDiv = null;
         var map;
@@ -111,12 +107,14 @@
           botPane = document.getElementById('botPane');
           detailPane = document.getElementById('detailPane');
           mapDiv = document.getElementById('map');
-          mapDiv.style.height = (mapDiv.clientHeight - botPane.clientHeight - detailPane.clientHeight) + 'px';
+          if (window.innerHeight * 25 / 100 < 500) {
+            detailPane.style.height = (window.innerHeight * 25 / 100) + 'px';
+          }
+          botPane.style.bottom = detailPane.clientHeight + 'px';
+          mapDiv.style.bottom = (botPane.clientHeight + detailPane.clientHeight) + 'px';
           mapResized = true;
           initMap();
           
-          //fullTest = document.getElementById('fullTest');
-          //mapDiv.style.height = fullTest.clientHeight + 'px';
           txtLat = document.getElementById('txtLat');
           txtLng = document.getElementById('txtLng');
           txtLongCoord = document.getElementById('txtLongCoord');
@@ -263,6 +261,7 @@
           currLoc = srw;
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
+            streetViewControl: false,
             center: currLoc,
             styles: [],
             draggableCursor: 'pointer'
@@ -280,15 +279,6 @@
 
           directionsService = new google.maps.DirectionsService();
           
-          //map.addListener('dragstart', function() {
-          //  if (renderCtx != null)
-          //    renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
-          //});
-          //
-          //map.addListener('dragend', function() {
-          //  drawAll();
-          //});
-          
           map.addListener('zoom_changed', function() {
             drawAll();
           });
@@ -304,24 +294,6 @@
               centerCount();
             }
           });
-          
-          //setInterval(function() {
-          //  var center = map.getCenter();
-          //  moving = false;
-          //  if (center.lat() != currLoc.lat() || center.lng() != currLoc.lng())
-          //    moving = true;
-          //  currLoc = center;
-          //  if (!moving) {
-          //    if (currLoc.lat() != lastLoc.lat() || currLoc.lng() != lastLoc.lng()) {
-          //      drawAll();
-          //      lastLoc = currLoc;
-          //    }
-          //  } else {
-          //    if (renderCtx != null && !prevMoving)
-          //      renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
-          //  }
-          //  prevMoving = moving;
-          //}, 500);
         }
         
         function addPoint() {

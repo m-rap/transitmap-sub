@@ -9,17 +9,17 @@
         margin: 0;
       }
       #map {
-        /*height: 800px;*/
+        position: absolute;
         width: 100%;
-        height: 100%;
+        top: 0;
       }
       #renderCanvas {
         position: absolute;
-        top: 0;
-        left: 0;
         z-index: 10;
       }
       #botPane {
+        position: absolute;
+        bottom: 0;
         padding: 6px;
       }
     </style>
@@ -52,7 +52,7 @@
         window.onload = function() {
           botPane = document.getElementById('botPane');
           mapDiv = document.getElementById('map');
-          mapDiv.style.height = (mapDiv.clientHeight - botPane.clientHeight) + 'px';
+          mapDiv.style.bottom = botPane.clientHeight + 'px';
           mapResized = true;
           initMap();
           
@@ -143,6 +143,7 @@
           mapDiv = document.getElementById('map');
           map = new google.maps.Map(mapDiv, {
             zoom: 13,
+            streetViewControl: false,
             center: currLoc,
             styles: []
           });
