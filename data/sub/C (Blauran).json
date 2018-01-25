@@ -1,0 +1,69 @@
+{
+  "nama": "C (Blauran)",
+  "berangkat": [  {
+    "request":
+    {
+      "origin": {"lat": -7.233183472838547, "lng": 112.72276818752289},
+      "destination": {"lat": -7.268278900614989, "lng": 112.76085555553436},
+      "waypoints": [
+          {"location": {"lat": -7.236658547653132, "lng": 112.72128224372864}, "stopover": false},
+          {"location": {"lat": -7.236725068732356, "lng": 112.72054731845856}, "stopover": false},
+          {"location": {"lat": -7.245077377491008, "lng": 112.72175431251526}, "stopover": false},
+          {"location": {"lat": -7.246226838899586, "lng": 112.73702681064606}, "stopover": false},
+          {"location": {"lat": -7.24570000278459, "lng": 112.73533165454865}, "stopover": false},
+          {"location": {"lat": -7.248956797992813, "lng": 112.73193597793579}, "stopover": false},
+          {"location": {"lat": -7.255965213691806, "lng": 112.72809505462646}, "stopover": false},
+          {"location": {"lat": -7.256007785359604, "lng": 112.7351438999176}, "stopover": false},
+          {"location": {"lat": -7.25579492698035, "lng": 112.73779928684235}, "stopover": false},
+          {"location": {"lat": -7.2556406045924335, "lng": 112.74303495883942}, "stopover": false},
+          {"location": {"lat": -7.259748754937861, "lng": 112.74371087551117}, "stopover": false},
+          {"location": {"lat": -7.259722147867207, "lng": 112.74607121944427}, "stopover": false},
+          {"location": {"lat": -7.255901356182565, "lng": 112.74783611297607}, "stopover": false},
+          {"location": {"lat": -7.25279361311608, "lng": 112.74963855743408}, "stopover": false},
+          {"location": {"lat": -7.248983405699831, "lng": 112.75206327438354}, "stopover": false},
+          {"location": {"lat": -7.251878314835312, "lng": 112.75521755218506}, "stopover": false},
+          {"location": {"lat": -7.256678288596141, "lng": 112.7541071176529}, "stopover": false},
+          {"location": {"lat": -7.258359863746524, "lng": 112.75497078895569}, "stopover": false},
+          {"location": {"lat": -7.259256523875984, "lng": 112.75667667388916}, "stopover": false},
+          {"location": {"lat": -7.2576042199945, "lng": 112.75783002376556}, "stopover": false},
+          {"location": {"lat": -7.256497359249793, "lng": 112.75872588157654}, "stopover": false},
+          {"location": {"lat": -7.261786851871441, "lng": 112.75804460048676}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#ff6600"
+  }],
+  "kembali": [  {
+    "request":
+    {
+      "origin": {"lat": -7.233183472838547, "lng": 112.72276818752289},
+      "destination": {"lat": -7.268278900614989, "lng": 112.76085555553436},
+      "waypoints": [
+          {"location": {"lat": -7.236658547653132, "lng": 112.72128224372864}, "stopover": false},
+          {"location": {"lat": -7.236725068732356, "lng": 112.72054731845856}, "stopover": false},
+          {"location": {"lat": -7.245077377491008, "lng": 112.72175431251526}, "stopover": false},
+          {"location": {"lat": -7.246226838899586, "lng": 112.73702681064606}, "stopover": false},
+          {"location": {"lat": -7.24570000278459, "lng": 112.73533165454865}, "stopover": false},
+          {"location": {"lat": -7.248956797992813, "lng": 112.73193597793579}, "stopover": false},
+          {"location": {"lat": -7.255965213691806, "lng": 112.72809505462646}, "stopover": false},
+          {"location": {"lat": -7.256007785359604, "lng": 112.7351438999176}, "stopover": false},
+          {"location": {"lat": -7.25579492698035, "lng": 112.73779928684235}, "stopover": false},
+          {"location": {"lat": -7.2556406045924335, "lng": 112.74303495883942}, "stopover": false},
+          {"location": {"lat": -7.259748754937861, "lng": 112.74371087551117}, "stopover": false},
+          {"location": {"lat": -7.259722147867207, "lng": 112.74607121944427}, "stopover": false},
+          {"location": {"lat": -7.255901356182565, "lng": 112.74783611297607}, "stopover": false},
+          {"location": {"lat": -7.25279361311608, "lng": 112.74963855743408}, "stopover": false},
+          {"location": {"lat": -7.248983405699831, "lng": 112.75206327438354}, "stopover": false},
+          {"location": {"lat": -7.251878314835312, "lng": 112.75521755218506}, "stopover": false},
+          {"location": {"lat": -7.256678288596141, "lng": 112.7541071176529}, "stopover": false},
+          {"location": {"lat": -7.258359863746524, "lng": 112.75497078895569}, "stopover": false},
+          {"location": {"lat": -7.259256523875984, "lng": 112.75667667388916}, "stopover": false},
+          {"location": {"lat": -7.2576042199945, "lng": 112.75783002376556}, "stopover": false},
+          {"location": {"lat": -7.256497359249793, "lng": 112.75872588157654}, "stopover": false},
+          {"location": {"lat": -7.261786851871441, "lng": 112.75804460048676}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#ff6600"
+  }]
+}

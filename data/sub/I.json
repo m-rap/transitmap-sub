@@ -1,0 +1,57 @@
+{
+  "nama": "I",
+  "berangkat": [  {
+    "request":
+    {
+      "origin": {"lat": -7.282140706953804, "lng": 112.71615386009216},
+      "destination": {"lat": -7.235858963513422, "lng": 112.6080447435379},
+      "waypoints": [
+          {"location": {"lat": -7.2824386911785535, "lng": 112.71713018417358}, "stopover": false},
+          {"location": {"lat": -7.282800528899485, "lng": 112.72254288196564}, "stopover": false},
+          {"location": {"lat": -7.283441725908299, "lng": 112.72609412670135}, "stopover": false},
+          {"location": {"lat": -7.276995126701651, "lng": 112.72790729999542}, "stopover": false},
+          {"location": {"lat": -7.2743451564549435, "lng": 112.7255630493164}, "stopover": false},
+          {"location": {"lat": -7.266496257226487, "lng": 112.70066678524017}, "stopover": false},
+          {"location": {"lat": -7.259652969476136, "lng": 112.68769562244415}, "stopover": false},
+          {"location": {"lat": -7.258241461904449, "lng": 112.67345309257507}, "stopover": false},
+          {"location": {"lat": -7.259895093798309, "lng": 112.6715835928917}, "stopover": false},
+          {"location": {"lat": -7.257982042029164, "lng": 112.66828715801239}, "stopover": false},
+          {"location": {"lat": -7.257173183201283, "lng": 112.66845479607582}, "stopover": false},
+          {"location": {"lat": -7.2551057972868955, "lng": 112.66128122806549}, "stopover": false},
+          {"location": {"lat": -7.252889400037909, "lng": 112.6540955901146}, "stopover": false},
+          {"location": {"lat": -7.250468113261143, "lng": 112.64569759368896}, "stopover": false},
+          {"location": {"lat": -7.248914225658294, "lng": 112.64247626066208}, "stopover": false},
+          {"location": {"lat": -7.238973475442118, "lng": 112.62193322181702}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#003380"
+  }],
+  "kembali": [  {
+    "request":
+    {
+      "origin": {"lat": -7.282140706953804, "lng": 112.71615386009216},
+      "destination": {"lat": -7.235858963513422, "lng": 112.6080447435379},
+      "waypoints": [
+          {"location": {"lat": -7.2824386911785535, "lng": 112.71713018417358}, "stopover": false},
+          {"location": {"lat": -7.282800528899485, "lng": 112.72254288196564}, "stopover": false},
+          {"location": {"lat": -7.283441725908299, "lng": 112.72609412670135}, "stopover": false},
+          {"location": {"lat": -7.276995126701651, "lng": 112.72790729999542}, "stopover": false},
+          {"location": {"lat": -7.2743451564549435, "lng": 112.7255630493164}, "stopover": false},
+          {"location": {"lat": -7.266496257226487, "lng": 112.70066678524017}, "stopover": false},
+          {"location": {"lat": -7.259652969476136, "lng": 112.68769562244415}, "stopover": false},
+          {"location": {"lat": -7.258241461904449, "lng": 112.67345309257507}, "stopover": false},
+          {"location": {"lat": -7.259895093798309, "lng": 112.6715835928917}, "stopover": false},
+          {"location": {"lat": -7.257982042029164, "lng": 112.66828715801239}, "stopover": false},
+          {"location": {"lat": -7.257173183201283, "lng": 112.66845479607582}, "stopover": false},
+          {"location": {"lat": -7.2551057972868955, "lng": 112.66128122806549}, "stopover": false},
+          {"location": {"lat": -7.252889400037909, "lng": 112.6540955901146}, "stopover": false},
+          {"location": {"lat": -7.250468113261143, "lng": 112.64569759368896}, "stopover": false},
+          {"location": {"lat": -7.248914225658294, "lng": 112.64247626066208}, "stopover": false},
+          {"location": {"lat": -7.238973475442118, "lng": 112.62193322181702}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#003380"
+  }]
+}

@@ -23,8 +23,8 @@
         display: block;
       }
       #botPane {
-        overflow-x: auto;
-        white-space: nowrap;
+        /*white-space: nowrap;*/
+        overflow: auto;
       }
       #botPane, #detailPane {
         position: absolute;
@@ -110,6 +110,7 @@
           if (window.innerHeight * 25 / 100 < 500) {
             detailPane.style.height = (window.innerHeight * 25 / 100) + 'px';
           }
+          //detailPane.style.position = botPane.style.position = "absolute";
           botPane.style.bottom = detailPane.clientHeight + 'px';
           mapDiv.style.bottom = (botPane.clientHeight + detailPane.clientHeight) + 'px';
           mapResized = true;
@@ -167,7 +168,7 @@
             } else {
               statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
-                if (retrying && stopRetry) {
+                if (stopRetry) {
                   retrying = false;
                   stopRetry = false;
                   return;

@@ -1,0 +1,41 @@
+{
+  "nama": "R",
+  "berangkat": [  {
+    "request":
+    {
+      "origin": {"lat": -7.22379584760168, "lng": 112.73790121078491},
+      "destination": {"lat": -7.241070204381657, "lng": 112.79451727867126},
+      "waypoints": [
+          {"location": {"lat": -7.235674034533955, "lng": 112.73814260959625}, "stopover": false},
+          {"location": {"lat": -7.237164107609325, "lng": 112.73787438869476}, "stopover": false},
+          {"location": {"lat": -7.239101195250221, "lng": 112.7374130487442}, "stopover": false},
+          {"location": {"lat": -7.243214818059052, "lng": 112.73863613605499}, "stopover": false},
+          {"location": {"lat": -7.242709264885303, "lng": 112.74381279945374}, "stopover": false},
+          {"location": {"lat": -7.238526455828999, "lng": 112.74535238742828}, "stopover": false},
+          {"location": {"lat": -7.2408626605812145, "lng": 112.75334000587463}, "stopover": false},
+          {"location": {"lat": -7.251617560914775, "lng": 112.79261291027069}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#deaa87"
+  }],
+  "kembali": [  {
+    "request":
+    {
+      "origin": {"lat": -7.22379584760168, "lng": 112.73790121078491},
+      "destination": {"lat": -7.241070204381657, "lng": 112.79451727867126},
+      "waypoints": [
+          {"location": {"lat": -7.235674034533955, "lng": 112.73814260959625}, "stopover": false},
+          {"location": {"lat": -7.237164107609325, "lng": 112.73787438869476}, "stopover": false},
+          {"location": {"lat": -7.239101195250221, "lng": 112.7374130487442}, "stopover": false},
+          {"location": {"lat": -7.243214818059052, "lng": 112.73863613605499}, "stopover": false},
+          {"location": {"lat": -7.242709264885303, "lng": 112.74381279945374}, "stopover": false},
+          {"location": {"lat": -7.238526455828999, "lng": 112.74535238742828}, "stopover": false},
+          {"location": {"lat": -7.2408626605812145, "lng": 112.75334000587463}, "stopover": false},
+          {"location": {"lat": -7.251617560914775, "lng": 112.79261291027069}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#deaa87"
+  }]
+}

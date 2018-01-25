@@ -1,0 +1,29 @@
+{
+  "nama": "V",
+  "berangkat": [  {
+    "request":
+    {
+      "origin": {"lat": -7.298465693557393, "lng": 112.73704290390015},
+      "destination": "Jl. Tambak Rejo",
+      "waypoints": [
+          {"location": {"lat": -7.259998861325057, "lng": 112.7487587928772}, "stopover": false},
+          {"location": {"lat": -7.248674756201677, "lng": 112.75976657867432}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#eeb211"
+  }],
+  "kembali": [  {
+    "request":
+    {
+      "origin": {"lat": -7.298465693557393, "lng": 112.73704290390015},
+      "destination": "Jl. Tambak Rejo",
+      "waypoints": [
+          {"location": {"lat": -7.259998861325057, "lng": 112.7487587928772}, "stopover": false},
+          {"location": {"lat": -7.248674756201677, "lng": 112.75976657867432}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#eeb211"
+  }]
+}

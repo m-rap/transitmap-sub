@@ -1,0 +1,39 @@
+{
+  "nama": "G",
+  "berangkat": [  {
+    "request":
+    {
+      "origin": {"lat": -7.29849229833002, "lng": 112.7368712425232},
+      "destination": {"lat": -7.266504239227583, "lng": 112.76083409786224},
+      "waypoints": [
+          {"location": {"lat": -7.295097516565724, "lng": 112.73362308740616}, "stopover": false},
+          {"location": {"lat": -7.295187973467072, "lng": 112.73264408111572}, "stopover": false},
+          {"location": {"lat": -7.29189426627404, "lng": 112.72911429405212}, "stopover": false},
+          {"location": {"lat": -7.279860921538657, "lng": 112.74188160896301}, "stopover": false},
+          {"location": {"lat": -7.272394917353678, "lng": 112.74935156106949}, "stopover": false},
+          {"location": {"lat": -7.277495320133082, "lng": 112.75199890136719}, "stopover": false},
+          {"location": {"lat": -7.278687268189972, "lng": 112.76223421096802}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#bdd09f"
+  }],
+  "kembali": [  {
+    "request":
+    {
+      "origin": {"lat": -7.29849229833002, "lng": 112.7368712425232},
+      "destination": {"lat": -7.266504239227583, "lng": 112.76083409786224},
+      "waypoints": [
+          {"location": {"lat": -7.295097516565724, "lng": 112.73362308740616}, "stopover": false},
+          {"location": {"lat": -7.295187973467072, "lng": 112.73264408111572}, "stopover": false},
+          {"location": {"lat": -7.29189426627404, "lng": 112.72911429405212}, "stopover": false},
+          {"location": {"lat": -7.279860921538657, "lng": 112.74188160896301}, "stopover": false},
+          {"location": {"lat": -7.272394917353678, "lng": 112.74935156106949}, "stopover": false},
+          {"location": {"lat": -7.277495320133082, "lng": 112.75199890136719}, "stopover": false},
+          {"location": {"lat": -7.278687268189972, "lng": 112.76223421096802}, "stopover": false}
+      ],
+      "optimizeWaypoints": false
+    },
+    "color": "#bdd09f"
+  }]
+}
