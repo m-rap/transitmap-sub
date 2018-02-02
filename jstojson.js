@@ -35,11 +35,10 @@ function routesToJson(routes) {
       \"waypoints\": [\n";
       for (var j in request.waypoints) {
         htmlStr += "\
-          " + waypointToJson(request.waypoints[j]) + ((j == request.waypoints.length - 1) ? "" : ",") + "\n";
+          " + locToJson(request.waypoints[j].location) + ((j == request.waypoints.length - 1) ? "" : ",") + "\n";
       }
       htmlStr += "\
-      ],\n\
-      \"optimizeWaypoints\": false\n\
+      ]\n\
     },\n\
     \"color\": \"" + routes[i].color + "\"\n\
   }" + ((i == routes.length - 1) ? "" : ", ");
@@ -47,9 +46,13 @@ function routesToJson(routes) {
   return htmlStr;
 }
 
-for (var i in data) {  
+function writeFileLoop(i) {
+  if (i >= data.length)
+    return;
+  
   var jsonStr = "\
 {\n\
+  \"timestamp\": " + Math.floor(Date.now() / 1000) + ",\n\
   \"nama\": \"" + data[i].nama + "\",\n\
   \"berangkat\": [" + routesToJson(data[i].berangkat) + "],\n\
   \"kembali\": [" + routesToJson(data[i].berangkat) + "]\n\
@@ -57,6 +60,26 @@ for (var i in data) {
   fs.writeFile("data/sub/" + data[i].nama + ".json", jsonStr, function(err) {
     if (err) {
       console.log(err);
+    } else {
+      console.log(data[i].nama + ".json written");
+      i++;
+      writeFileLoop(i);
     }
   });
 }
+
+writeFileLoop(0);
+
+//for (var i in data) {  
+//  var jsonStr = "\
+//{\n\
+//  \"nama\": \"" + data[i].nama + "\",\n\
+//  \"berangkat\": [" + routesToJson(data[i].berangkat) + "],\n\
+//  \"kembali\": [" + routesToJson(data[i].berangkat) + "]\n\
+//}";
+//  fs.writeFile("data/sub/" + data[i].nama + ".json", jsonStr, function(err) {
+//    if (err) {
+//      console.log(err);
+//    }
+//  });
+//}

@@ -8,18 +8,22 @@
     <div style="position: relative;">
       <div id="status"></div>
       <div id="code"></div>
-      <script src="/data/sub.js"></script>
+      <script src="/js/util.js"></script>
       <script>
         var statusDiv;
         var codeDiv;
         var directionsService;
         var data = null;
         var routes = new Array();
+        var mapCalledback = false;
 
         window.onload = function() {
           statusDiv = document.getElementById('status');
           codeDiv = document.getElementById('code');
-          initData();
+          getJSON('/getall', function(status, response) {
+            data = response;
+            initMap();
+          });
         }
         
         function getRoutes(rute, i) {
@@ -39,7 +43,7 @@
                   path.push(response.routes[k].overview_path[j]);
                 }
               }
-              routes.push({nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
+              routes.push({timestamp: Math.floor(Date.now() / 1000), nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
               i++;
               getRoutes(rute, i);
             }  else {
@@ -51,44 +55,47 @@
                 }, 1000);
               }
             }
-            
-            
           });
         }
 
         function initMap() {
-          if (data == null) {
-            setTimeout(initMap, 50);
+          if (data == null || !mapCalledback) {
             return;
-          }
-
-          for (a in data) {
-            for (i in data[a].berangkat)
-              data[a].berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-            for (i in data[a].kembali)
-              data[a].kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
           }
 
           directionsService = new google.maps.DirectionsService();
           
           var rute = new Array();
+          
           for (a in data) {
-            for (i in data[a].berangkat) {
-              data[a].berangkat[i].nama = data[a].nama;
-              data[a].berangkat[i].tipe = 'berangkat';
-              rute.push(data[a].berangkat[i]);
-            }
-            for (i in data[a].kembali) {
-              data[a].kembali[i].nama = data[a].nama;
-              data[a].kembali[i].tipe = 'kembali';
-              rute.push(data[a].kembali[i]);
+            var tmp = [data[a].berangkat, data[a].kembali];
+            
+            for (i in tmp) {
+              for (j in tmp[i]) {
+                tmp[i][j].nama = data[a].nama;
+                tmp[i][j].tipe = (i == 0) ? 'berangkat' : 'kembali';
+                tmp[i][j].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+                tmp[i][j].request.optimizeWaypoints = false;
+
+                for (k in tmp[i][j].request.waypoints) {
+                  var loc = tmp[i][j].request.waypoints[k];
+                  tmp[i][j].request.waypoints[k] = {location: loc, stopover: false};
+                }
+
+                rute.push(tmp[i][j]);
+              }
             }
           }
           getRoutes(rute, 0);
         }
+        
+        function mapCallback() {
+          mapCalledback = true;
+          initMap();
+        }
       </script>
       <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=initMap">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAppL0GXx5hISM9TBQExY60E_Bbamejdg&callback=mapCallback">
       </script>
     </div>
   </body>
