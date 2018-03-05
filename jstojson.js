@@ -55,7 +55,7 @@ function writeFileLoop(i) {
   \"timestamp\": " + Math.floor(Date.now() / 1000) + ",\n\
   \"nama\": \"" + data[i].nama + "\",\n\
   \"berangkat\": [" + routesToJson(data[i].berangkat) + "],\n\
-  \"kembali\": [" + routesToJson(data[i].berangkat) + "]\n\
+  \"kembali\": [" + routesToJson(data[i].kembali) + "]\n\
 }";
   fs.writeFile("data/sub/" + data[i].nama + ".json", jsonStr, function(err) {
     if (err) {

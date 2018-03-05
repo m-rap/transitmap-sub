@@ -55,6 +55,19 @@ app.get('/getall', function(req, res) {
   });
 });
 
+app.get("/getpaths", function(req, res) {
+  fs.readdir(subDir, function(err, items) {
+    var resObj = [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].indexOf("-paths") != -1) {
+        var line = require(path.join(subDir, items[i]));
+        resObj = resObj.concat(line);
+      }
+    }
+    res.send(JSON.stringify(resObj));
+  });
+});
+
 app.post('/put', function(req, res) {
   var dataStr = "";
   req.on('data', function(data) {

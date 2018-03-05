@@ -58,7 +58,8 @@
           
           selRoute = document.getElementById('selRoute');
           selTipe = document.getElementById('selTipe');
-          getJSON('/data/sub-paths.json', function(status, response) {
+          getJSON('/getpaths', function(status, response) {
+          //getJSON('/data/sub-paths.json', function(status, response) {
             paths = response;
             var labels = [];
             var selRouteOptions = selRoute.innerHTML;
