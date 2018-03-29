@@ -56,8 +56,10 @@
         var txtName;
         var selType;
         var directionsService;
+        
         var berangkat =
             [{
+              update: false,
               request: {
                 origin: null, 
                 destination: null,
@@ -68,6 +70,7 @@
               color: '#61bb46'
             }];
         var kembali = [{
+              update: false,
               request: {
                 origin: null, 
                 destination: null,
@@ -77,6 +80,9 @@
               },
               color: '#61bb46'
             }];
+        var berangkatPath = [{path: [], color: berangkat[0].color}];
+        var kembaliPath = [{path: [], color: kembali[0].color}];
+        
         var selected = -1;
         var renderCanvas;
         var renderCtx = null;
@@ -128,59 +134,69 @@
           invalidateList();
         }
         
-        function drawDirections(rute, i) {
-          if (i >= rute.length) {
-            statusSpan.innerHTML = "Status: Ready";
-            return;
+        //function drawDirections(rute, i) {
+        //  if (i >= rute.length) {
+        //    statusSpan.innerHTML = "Status: Ready";
+        //    return;
+        //  }
+        //  
+        //  statusSpan.innerHTML = "Status: Requesting route " + (i + 1);
+        //
+        //  directionsService.route(rute[i].request, function(response, status) {
+        //    if (status == google.maps.DirectionsStatus.OK) {
+        //      if (retrying && stopRetry) {
+        //        retrying = false;
+        //        stopRetry = false;
+        //        return;
+        //      }
+        //      retrying = false;
+        //      
+        //      renderCtx.beginPath();
+        //      for (j = 0; j < response.routes[0].overview_path.length; j++) {
+        //        var latLng = response.routes[0].overview_path[j];
+        //        var x = (latLng.lng() - bounds.getSouthWest().lng()) * widthRatio;
+        //        var y = renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio);
+        //        if (j == 0) {
+        //          renderCtx.moveTo(x, y);
+        //        } else {
+        //          renderCtx.lineTo(x, y);
+        //        }
+        //      }
+        //      
+        //      var rgb = hexToRgb(rute[i].color);
+        //      
+        //      renderCtx.lineWidth = 3;
+        //      renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + '1.0)';
+        //      renderCtx.stroke();
+        //
+        //      i++;
+        //      drawDirections(rute, i);
+        //    } else {
+        //      statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
+        //      if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+        //        if (stopRetry) {
+        //          retrying = false;
+        //          stopRetry = false;
+        //          return;
+        //        }
+        //        statusSpan.innerHTML +=  " Retrying...";
+        //        retrying = true;
+        //        setTimeout(function() {
+        //          drawDirections(rute, i)
+        //        }, 1000);
+        //      }
+        //    }
+        //  });
+        //}
+        
+        function addPath(tipe, indexRoute, path) {
+          if (tipe == 0) {
+            berangkatPath[indexRoute].path = path;
+            berangkat[indexRoute].update = false;
+          } else {
+            kembaliPath[indexRoute].path = path;
+            kembali[indexRoute].update = false;
           }
-          
-          statusSpan.innerHTML = "Status: Requesting route " + (i + 1);
-
-          directionsService.route(rute[i].request, function(response, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-              if (retrying && stopRetry) {
-                retrying = false;
-                stopRetry = false;
-                return;
-              }
-                
-              retrying = false;
-              renderCtx.beginPath();
-              for (j = 0; j < response.routes[0].overview_path.length; j++) {
-                var latLng = response.routes[0].overview_path[j];
-                var x = (latLng.lng() - bounds.getSouthWest().lng()) * widthRatio;
-                var y = renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio);
-                if (j == 0) {
-                  renderCtx.moveTo(x, y);
-                } else {
-                  renderCtx.lineTo(x, y);
-                }
-              }
-              
-              var rgb = hexToRgb(rute[i].color);
-              
-              renderCtx.lineWidth = 3;
-              renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + '1.0)';
-              renderCtx.stroke();
-
-              i++;
-              drawDirections(rute, i);
-            } else {
-              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
-              if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
-                if (stopRetry) {
-                  retrying = false;
-                  stopRetry = false;
-                  return;
-                }
-                statusSpan.innerHTML +=  " Retrying...";
-                retrying = true;
-                setTimeout(function() {
-                  drawDirections(rute, i)
-                }, 1000);
-              }
-            }
-          });
         }
         
         function initCanvas() {
@@ -209,6 +225,168 @@
           widthRatio = renderCanvas.width / mapWidth;
           heightRatio = renderCanvas.height / mapHeight;
         }
+        
+        function getPath(rute, i, callback) {
+          if (i >= rute.length) {
+            statusSpan.innerHTML = "Status: Ready";
+            callback(rute);
+            return;
+          }
+          
+          statusSpan.innerHTML = "Status: Requesting route " + rute[i].tipe + " " + rute[i].indexRoute;
+          directionsService.route(rute[i].request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              if (retrying && stopRetry) {
+                retrying = false;
+                stopRetry = false;
+                return;
+              }
+              retrying = false;
+              
+              var path = new Array();
+              for (j in response.routes) {
+                for (k in response.routes[j].overview_path) {
+                  path.push(response.routes[j].overview_path[k]);
+                }
+              }
+              addPath(rute[i].tipe, rute[i].indexRoute, path);
+              
+              i++;
+              getPath(rute, i, callback);
+            } else {
+              statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
+              if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                if (stopRetry) {
+                  retrying = false;
+                  stopRetry = false;
+                  return;
+                }
+                statusSpan.innerHTML +=  " Retrying...";
+                retrying = true;
+                setTimeout(function() {
+                  getPath(rute, i, callback);
+                }, 1000);
+              }
+            }
+          });
+        }
+        
+        function getPaths(callback) {
+          var rute = new Array();
+          var tmp = [berangkat, kembali];
+          var tmpPath = [berangkatPath, kembaliPath];
+          for (i = 0; i < tmp.length; i++) {
+            for (j = 0; j < tmp[i].length; j++) {
+              if (!tmp[i][j].update)
+                continue;
+              if (tmp[i][j].request.origin == null || tmp[i][j].request.destination == null) {
+                tmpPath[i][j].path = [];
+                tmp[i][j].update = false;
+                continue;
+              }
+              //var checkbox = document.getElementById("seldraw_" + i + "_" + j);
+              //if (checkbox != null && !checkbox.checked)
+              //  continue;
+              
+              tmp[i][j].tipe = i;
+              tmp[i][j].indexRoute = j;
+              tmp[i][j].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+              tmp[i][j].request.optimizeWaypoints = false;
+              
+              rute.push(tmp[i][j]);
+            } 
+          }
+          
+          //drawDirections(rute, 0);
+          getPath(rute, 0, callback);
+        }
+        
+        function calculateLines(callback) {
+          var tmpPath = [berangkatPath, kembaliPath];
+          var lines = [];
+          for (i = 0; i < tmpPath.length; i++) {
+            for (j = 0; j < tmpPath[i].length; j++) {
+              var checkbox = document.getElementById("seldraw_" + i + "_" + j);
+              if (checkbox != null && !checkbox.checked)
+                continue;
+
+              lines.push({vtx: [], color: tmpPath[i][j].color});
+              for (k = 0; k < tmpPath[i][j].path.length; k++) {
+                var latLng = tmpPath[i][j].path[k];
+                var x = (latLng.lng() - bounds.getSouthWest().lng()) * widthRatio;
+                var y = renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio);
+                lines[lines.length - 1].vtx.push({x: x, y: y});
+              }
+            }
+          }
+          callback(lines);
+        }
+        
+        function drawLines(lines) {
+          for (i = 0; i < lines.length; i++) {
+            renderCtx.beginPath();
+            for (j = 0; j < lines[i].vtx.length; j++) {
+              if (j == 0) {
+                renderCtx.moveTo(lines[i].vtx[j].x, lines[i].vtx[j].y);
+              } else {
+                renderCtx.lineTo(lines[i].vtx[j].x, lines[i].vtx[j].y);
+              }
+            }
+
+            var rgb = hexToRgb(lines[i].color);
+
+            renderCtx.lineWidth = 3;
+            renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + '1.0)';
+            renderCtx.stroke();
+          }
+        }
+        
+        function drawPoints(rute) {
+          renderCtx.fillStyle = "#3370d4";
+          var tmp = [berangkat, kembali];
+          var points = [];
+          for (i = 0; i < tmp.length; i++) {
+            for (j = 0; j < tmp[i].length; j++) {
+              var checkbox = document.getElementById("seldraw_" + i + "_" + j);
+              if (checkbox != null && !checkbox.checked)
+                continue;
+              
+              var x, y;
+              if (tmp[i][j].request.origin != null) {
+                x = (tmp[i][j].request.origin.lng - bounds.getSouthWest().lng()) * widthRatio;
+                y = renderCanvas.height - ((tmp[i][j].request.origin.lat - bounds.getSouthWest().lat()) * heightRatio);
+                points.push({x: x, y: y});
+              }
+              for (k = 0; k < tmp[i][j].request.waypoints.length; k++) {
+                x = (tmp[i][j].request.waypoints[k].location.lng - bounds.getSouthWest().lng()) * widthRatio;
+                y = renderCanvas.height - ((tmp[i][j].request.waypoints[k].location.lat - bounds.getSouthWest().lat()) * heightRatio);
+                points.push({x: x, y: y});
+              }
+              if (tmp[i][j].request.destination != null) {
+                x = (tmp[i][j].request.destination.lng - bounds.getSouthWest().lng()) * widthRatio;
+                y = renderCanvas.height - ((tmp[i][j].request.destination.lat - bounds.getSouthWest().lat()) * heightRatio);
+                points.push({x: x, y: y});
+              }
+            }
+          }
+          
+          for (i = 0; i < points.length; i++) {
+            renderCtx.beginPath();
+            renderCtx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
+            renderCtx.closePath();
+            renderCtx.fill();
+          }
+        }
+        
+        function drawCurPoint() {
+          renderCtx.fillStyle = "red";
+          var x = (Number(txtLng.value) - bounds.getSouthWest().lng()) * widthRatio;
+          var y = renderCanvas.height - ((Number(txtLat.value) - bounds.getSouthWest().lat()) * heightRatio);
+          renderCtx.beginPath();
+          renderCtx.arc(x, y, 5, 0, 2 * Math.PI);
+          renderCtx.closePath();
+          renderCtx.fill();
+        }
 
         function drawAll() {
           if (retrying) {
@@ -219,30 +397,13 @@
           
           initCanvas();
           
-          for (i in berangkat)
-            berangkat[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-          for (i in kembali)
-            kembali[i].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-          
-          var rute = new Array();
-          for (i in berangkat) {
-            if (berangkat[i].request.origin == null || berangkat[i].request.destination == null)
-              continue;
-            var checkbox = document.getElementById("seldraw_0_" + i);
-            if (checkbox != null && !checkbox.checked)
-              continue;
-            rute.push(berangkat[i]);
-          }
-          for (i in kembali) {
-            if (kembali[i].request.origin == null || kembali[i].request.destination == null)
-              continue;
-            var checkbox = document.getElementById("seldraw_1_" + i);
-            if (checkbox != null && !checkbox.checked)
-              continue;
-            rute.push(kembali[i]);
-          }
-          if (rute.length > 0)
-            drawDirections(rute, 0);
+          getPaths(function(rute) {
+            calculateLines(function(lines) {
+              drawLines(lines);
+              drawPoints(rute);
+              drawCurPoint();
+            });
+          });
         }
         
         function centerCount() {
@@ -276,6 +437,7 @@
             txtLat.value = latLng.lat();
             txtLng.value = latLng.lng();
             txtLongCoord.value = '{lat: ' + latLng.lat() + ', lng: ' + latLng.lng() + '}';
+            drawAll();
           });
 
           directionsService = new google.maps.DirectionsService();
@@ -285,19 +447,20 @@
           });
           
           map.addListener('center_changed', function() {
-            var start = false;
-            if (centerCounter == 0)
-              start = true;
-            centerCounter = 2;
-            if (start) {
-              if (renderCtx != null)
-                renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
-              centerCount();
-            }
+            drawAll();
+            //var start = false;
+            //if (centerCounter == 0)
+            //  start = true;
+            //centerCounter = 2;
+            //if (start) {
+            //  if (renderCtx != null)
+            //    renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+            //  centerCount();
+            //}
           });
         }
         
-        function addPoint() {
+        function addLoc() {
           if (radioSelected == null)
             return;
           
@@ -305,9 +468,10 @@
             return;
           var location = {lat: Number(txtLat.value), lng: Number(txtLng.value)};
           
-          var request = (radioSelected.type == 0) ?
-              berangkat[radioSelected.idx].request :
-              kembali[radioSelected.idx].request;
+          var tmp = (radioSelected.type == 0) ?
+              berangkat[radioSelected.idx] :
+              kembali[radioSelected.idx];
+          var request = tmp.request;
           
           if (request.destination != null) {
             request.waypoints.push({location: request.destination, stopover: false});
@@ -318,25 +482,63 @@
           } else {
             request.destination = location;
           }
+          tmp.update = true;
           
           invalidateList();
           if (request.origin != null && request.destination != null)
             drawAll();
         }
         
-        function addList(type) {
-          var temp;
-          var txtEl;
+        function removeLoc(type, idx, locIdx) {
+          var tmp, tmpPath;
+          if (type == 0) {
+            tmp = berangkat[idx];
+            tmpPath = berangkatPath[idx];
+          } else {
+            tmp = kembali[idx];
+            tmpPath = kembaliPath[idx];
+          }
+          
+          var request = tmp.request;
+          if (request.origin != null) {
+            request.waypoints.splice(0, 0, {location: request.origin, stopover: false});
+            request.origin = null;
+          }
+          if (request.destination != null) {
+            request.waypoints.push({location: request.destination, stopover: false});
+            request.destination = null;
+          }
+          request.waypoints.splice(locIdx, 1);
+          if (request.waypoints.length > 0) {
+            request.origin = request.waypoints[0].location;
+            request.waypoints.splice(0, 1);
+          }
+          if (request.waypoints.length > 0) {
+            request.destination = request.waypoints[request.waypoints.length - 1].location;
+            request.waypoints.splice(request.waypoints.length - 1, 1);
+          }
+          
+          tmp.update = true;
+          
+          invalidateList();
+          drawAll();
+        }
+        
+        function addRoute(type) {
+          var temp, tempPath, txtEl;
           if (type == 0) {
             temp = berangkat;
+            tempPath = berangkatPath;
             txtEl = document.getElementById('txtBerangkatColor');
           } else {
             temp = kembali;
+            tempPath = kembaliPath;
             txtEl = document.getElementById('txtKembaliColor');
           }
           temp.push({
+              update: false,
               request: {
-                origin: null, 
+                origin: null,
                 destination: null,
                 waypoints: [
                 ],
@@ -344,12 +546,26 @@
               },
               color: txtEl.value
             });
-          if (type == 0) {
-            berangkat = temp;
-          } else {
-            kembali = temp;
-          }
+          tempPath.push({path: [], color: txtEl.value});
           invalidateList();
+        }
+        
+        function removeRoute(type, idx) {
+          var tmp, tmpPath;
+          if (type == 0) {
+            tmp = berangkat;
+            tmpPath = berangkatPath;
+          } else {
+            tmp = kembali;
+            tmpPath = kembaliPath;
+          }
+          
+          tmp.splice(idx, 1);
+          tmpPath.splice(idx, 1);
+          
+          radioSelected = null;
+          invalidateList();
+          drawAll();
         }
         
         function invalidateList() {
@@ -393,40 +609,6 @@
         
         function radLocOnChange(type, idx) {
           radioSelected = {type: type, idx: idx};
-        }
-        
-        function removeRoute(type, idx) {
-          if (type == 0) {
-            berangkat.splice(idx, 1);
-          } else {
-            kembali.splice(idx, 1);
-          }
-          radioSelected = null;
-          invalidateList();
-          drawAll();
-        }
-        
-        function removeLoc(type, idx, locIdx) {
-          var request = (type == 0) ? berangkat[idx].request : kembali[idx].request;
-          if (request.origin != null) {
-            request.waypoints.splice(0, 0, {location: request.origin, stopover: false});
-            request.origin = null;
-          }
-          if (request.destination != null) {
-            request.waypoints.push({location: request.destination, stopover: false});
-            request.destination = null;
-          }
-          request.waypoints.splice(locIdx, 1);
-          if (request.waypoints.length > 0) {
-            request.origin = request.waypoints[0].location;
-            request.waypoints.splice(0, 1);
-          }
-          if (request.waypoints.length > 0) {
-            request.destination = request.waypoints[request.waypoints.length - 1].location;
-            request.waypoints.splice(request.waypoints.length - 1, 1);
-          }
-          invalidateList();
-          drawAll();
         }
         
         function locToCode(loc) {
@@ -509,16 +691,16 @@
         <input type="hidden" id="txtLat" />
         <input type="hidden" id="txtLng" />
         <input type="text" id="txtLongCoord" style="width: 300px;" />
-        <input type="button" id="btnAdd" value="Add" onclick="addPoint()" />
+        <input type="button" id="btnAdd" value="Add" onclick="addLoc()" />
         <input type="button" value="Refresh" onclick="drawAll()" />
         <span id="status"></span>
       </div>
       <div id="detailPane">
         Nama: <input id="txtName" type="text" /><br />
-        List berangkat: <input id="txtBerangkatColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addList(0)" />
+        List berangkat: <input id="txtBerangkatColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addRoute(0)" />
         <ul id="listBerangkat">
         </ul>
-        List kembali: <input id="txtKembaliColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addList(1)" />
+        List kembali: <input id="txtKembaliColor" type="text" style="width: 60px;" value="#61bb46" /> <input type="button" value="Add" onclick="addRoute(1)" />
         <ul id="listKembali">
         </ul>
         <input type="button" value="Save" onclick="saveInputs()" /><br />

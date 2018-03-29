@@ -117,22 +117,26 @@
             if (!isSelected)
               continue;
             
-            if ((selectedMode == 0 && paths[a].tipe == "kembali") ||
-                (selectedMode == 1 && paths[a].tipe == "berangkat"))
-              continue;
+            //if ((selectedMode == 0 && paths[a].tipe == "kembali") ||
+            //    (selectedMode == 1 && paths[a].tipe == "berangkat"))
+            //  continue;
             
+            var path = (selectedMode == 0) ? paths[a].berangkat : paths[a].kembali;
             renderCtx.beginPath();
-            for (i in paths[a].path) {
-              var latLng = paths[a].path[i];
-              if (i == 0)
-                renderCtx.moveTo((latLng.lng - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat()) * heightRatio));
-              else
-                renderCtx.lineTo((latLng.lng - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat()) * heightRatio));
+            for (i in path) {
+              for (j in path[i].path) {
+                var latLng = path[i].path[j];
+                  
+                if (j == 0)
+                  renderCtx.moveTo((latLng.lng - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat()) * heightRatio));
+                else
+                  renderCtx.lineTo((latLng.lng - bounds.getSouthWest().lng()) * widthRatio, renderCanvas.height - ((latLng.lat - bounds.getSouthWest().lat()) * heightRatio));
+              }
+              var rgb = hexToRgb(path[i].color);
+              renderCtx.lineWidth = 3;
+              renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)';
+              renderCtx.stroke();
             }
-            var rgb = hexToRgb(paths[a].color);
-            renderCtx.lineWidth = 3;
-            renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)';
-            renderCtx.stroke();
           }
         }
 

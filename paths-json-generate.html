@@ -14,7 +14,7 @@
         var codeDiv;
         var directionsService;
         var data = null;
-        var routes = new Array();
+        var paths = new Array();
         var mapCalledback = false;
         
         statusDiv = document.getElementById('status');
@@ -27,18 +27,27 @@
         //window.onload = function() {
         //}
         
-        function getRoutes(rute, i) {
+        function addPath(index, tipe, indexRoute, path) {
+          if (tipe == 0) {
+            paths[index].berangkat[indexRoute].path = path;
+          } else {
+            paths[index].kembali[indexRoute].path = path;
+          }
+          paths[index].timestamp = Math.floor(Date.now() / 1000);
+        }
+        
+        function getPaths(rute, i) {
           if (i >= rute.length) {
             statusDiv.innerHTML = "done";
-            //codeDiv.innerHTML = JSON.stringify(routes);
+            //codeDiv.innerHTML = JSON.stringify(paths);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/put", true);
             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-            xhr.send(JSON.stringify(routes));
+            xhr.send(JSON.stringify(paths));
             return;
           }
           
-          statusDiv.innerHTML = "requesting " + rute[i].nama;
+          statusDiv.innerHTML = "requesting " + data[rute[i].index].nama;
 
           directionsService.route(rute[i].request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
@@ -48,15 +57,17 @@
                   path.push(response.routes[k].overview_path[j]);
                 }
               }
-              routes.push({timestamp: Math.floor(Date.now() / 1000), nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
+              //paths.push({timestamp: Math.floor(Date.now() / 1000), nama: rute[i].nama, tipe: rute[i].tipe, color: rute[i].color, path: path});
+              addPath(rute[i].index, rute[i].tipe, rute[i].indexRoute, path);
+              
               i++;
-              getRoutes(rute, i);
+              getPaths(rute, i);
             }  else {
               console.log(i + ' ' + status);
               if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
                 console.log('Retrying..');
                 setTimeout(function() {
-                  getRoutes(rute, i)
+                  getPaths(rute, i)
                 }, 1000);
               }
             }
@@ -74,11 +85,16 @@
           
           for (a in data) {
             var tmp = [data[a].berangkat, data[a].kembali];
+            paths.push({nama: data[a].nama, timestamp: 0, berangkat: [], kembali: []});
+            var tmpPath = [paths[a].berangkat, paths[a].kembali];
             
             for (i in tmp) {
               for (j in tmp[i]) {
-                tmp[i][j].nama = data[a].nama;
-                tmp[i][j].tipe = (i == 0) ? 'berangkat' : 'kembali';
+                tmpPath[i].push({path: [], color: tmp[i][j].color});
+                
+                tmp[i][j].index = a;
+                tmp[i][j].tipe = i;
+                tmp[i][j].indexRoute = j;
                 tmp[i][j].request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
                 tmp[i][j].request.optimizeWaypoints = false;
 
@@ -91,7 +107,7 @@
               }
             }
           }
-          getRoutes(rute, 0);
+          getPaths(rute, 0);
         }
         
         function mapCallback() {

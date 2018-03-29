@@ -35,9 +35,9 @@ app.get('/getall', function(req, res) {
           var line2 = require(path.join(subDir, line1.nama + '-paths.json'));
           if (line2 instanceof Array &&
               line2.length > 1 &&
-              typeof line2[0].timestamp != "undefined" &&
-              line2[0].timestamp < line1.timestamp) {
-            console.log(line1.nama + " is old (" + line2[0].timestamp + "<" + line1.timestamp + ")");
+              typeof line2.timestamp != "undefined" &&
+              line2.timestamp < line1.timestamp) {
+            console.log(line1.nama + " is old (" + line2.timestamp + "<" + line1.timestamp + ")");
             isOld = true;
           }
         }
@@ -77,30 +77,38 @@ app.post('/put', function(req, res) {
     var routes = JSON.parse(dataStr);
     if (routes.length === 0)
       return;
-    var routesByName = [];
-    var i, j;
-    for (i in routes) {
-      if (routesByName.length === 0) {
-        routesByName.push([routes[i]]);
-        continue;
-      }
-      var found = false;
-      for (j in routesByName) {
-        if (routesByName[j][0].nama != routes[i].nama)
-          continue;
-        routesByName[j].push(routes[i]);
-        found = true;
-        break;
-      }
-      if (!found)
-        routesByName.push([routes[i]]);
-    }
-    for (i in routesByName) {
-      console.log("writing file " + routesByName[i][0].nama + '-paths.json');
-      fs.writeFile(path.join(subDir, routesByName[i][0].nama + '-paths.json'), JSON.stringify(routesByName[i]), function(err) {
+    
+    for (var i in routes) {
+      console.log("writing file " + routes[i].nama + '-paths.json');
+      fs.writeFile(path.join(subDir, routes[i].nama + '-paths.json'), JSON.stringify(routes[i]), function(err) {
         if (err) console.log(err.stack);
       });
     }
+    
+    //var routesByName = [];
+    //var i, j;
+    //for (i in routes) {
+    //  if (routesByName.length === 0) {
+    //    routesByName.push([routes[i]]);
+    //    continue;
+    //  }
+    //  var found = false;
+    //  for (j in routesByName) {
+    //    if (routesByName[j][0].nama != routes[i].nama)
+    //      continue;
+    //    routesByName[j].push(routes[i]);
+    //    found = true;
+    //    break;
+    //  }
+    //  if (!found)
+    //    routesByName.push([routes[i]]);
+    //}
+    //for (i in routesByName) {
+    //  console.log("writing file " + routesByName[i][0].nama + '-paths.json');
+    //  fs.writeFile(path.join(subDir, routesByName[i][0].nama + '-paths.json'), JSON.stringify(routesByName[i]), function(err) {
+    //    if (err) console.log(err.stack);
+    //  });
+    //}
   });
 });
 
