@@ -116,7 +116,6 @@
           if (window.innerHeight * 25 / 100 < 500) {
             detailPane.style.height = (window.innerHeight * 25 / 100) + 'px';
           }
-          //detailPane.style.position = botPane.style.position = "absolute";
           botPane.style.bottom = detailPane.clientHeight + 'px';
           mapDiv.style.bottom = (botPane.clientHeight + detailPane.clientHeight) + 'px';
           mapResized = true;
@@ -133,61 +132,6 @@
           
           invalidateList();
         }
-        
-        //function drawDirections(rute, i) {
-        //  if (i >= rute.length) {
-        //    statusSpan.innerHTML = "Status: Ready";
-        //    return;
-        //  }
-        //  
-        //  statusSpan.innerHTML = "Status: Requesting route " + (i + 1);
-        //
-        //  directionsService.route(rute[i].request, function(response, status) {
-        //    if (status == google.maps.DirectionsStatus.OK) {
-        //      if (retrying && stopRetry) {
-        //        retrying = false;
-        //        stopRetry = false;
-        //        return;
-        //      }
-        //      retrying = false;
-        //      
-        //      renderCtx.beginPath();
-        //      for (j = 0; j < response.routes[0].overview_path.length; j++) {
-        //        var latLng = response.routes[0].overview_path[j];
-        //        var x = (latLng.lng() - bounds.getSouthWest().lng()) * widthRatio;
-        //        var y = renderCanvas.height - ((latLng.lat() - bounds.getSouthWest().lat()) * heightRatio);
-        //        if (j == 0) {
-        //          renderCtx.moveTo(x, y);
-        //        } else {
-        //          renderCtx.lineTo(x, y);
-        //        }
-        //      }
-        //      
-        //      var rgb = hexToRgb(rute[i].color);
-        //      
-        //      renderCtx.lineWidth = 3;
-        //      renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + '1.0)';
-        //      renderCtx.stroke();
-        //
-        //      i++;
-        //      drawDirections(rute, i);
-        //    } else {
-        //      statusSpan.innerHTML = "Status: " + status + " route " + (i + 1) + ".";
-        //      if (status == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
-        //        if (stopRetry) {
-        //          retrying = false;
-        //          stopRetry = false;
-        //          return;
-        //        }
-        //        statusSpan.innerHTML +=  " Retrying...";
-        //        retrying = true;
-        //        setTimeout(function() {
-        //          drawDirections(rute, i)
-        //        }, 1000);
-        //      }
-        //    }
-        //  });
-        //}
         
         function addPath(tipe, indexRoute, path) {
           if (tipe == 0) {
@@ -284,9 +228,6 @@
                 tmp[i][j].update = false;
                 continue;
               }
-              //var checkbox = document.getElementById("seldraw_" + i + "_" + j);
-              //if (checkbox != null && !checkbox.checked)
-              //  continue;
               
               tmp[i][j].tipe = i;
               tmp[i][j].indexRoute = j;
@@ -297,7 +238,6 @@
             } 
           }
           
-          //drawDirections(rute, 0);
           getPath(rute, 0, callback);
         }
         
@@ -335,7 +275,7 @@
 
             var rgb = hexToRgb(lines[i].color);
 
-            renderCtx.lineWidth = 3;
+            renderCtx.lineWidth = 0.3 * map.getZoom();
             renderCtx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + '1.0)';
             renderCtx.stroke();
           }
@@ -372,7 +312,7 @@
           
           for (i = 0; i < points.length; i++) {
             renderCtx.beginPath();
-            renderCtx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
+            renderCtx.arc(points[i].x, points[i].y, 0.5 * map.getZoom(), 0, 2 * Math.PI);
             renderCtx.closePath();
             renderCtx.fill();
           }
@@ -383,7 +323,7 @@
           var x = (Number(txtLng.value) - bounds.getSouthWest().lng()) * widthRatio;
           var y = renderCanvas.height - ((Number(txtLat.value) - bounds.getSouthWest().lat()) * heightRatio);
           renderCtx.beginPath();
-          renderCtx.arc(x, y, 5, 0, 2 * Math.PI);
+          renderCtx.arc(x, y, 0.6 * map.getZoom(), 0, 2 * Math.PI);
           renderCtx.closePath();
           renderCtx.fill();
         }
@@ -425,7 +365,12 @@
             zoom: 13,
             streetViewControl: false,
             center: currLoc,
-            styles: [],
+            styles: [{
+              featureType: "poi",
+              stylers: [{
+                visibility: "off"
+              }]
+            }],
             draggableCursor: 'pointer'
           });
           
@@ -448,15 +393,6 @@
           
           map.addListener('center_changed', function() {
             drawAll();
-            //var start = false;
-            //if (centerCounter == 0)
-            //  start = true;
-            //centerCounter = 2;
-            //if (start) {
-            //  if (renderCtx != null)
-            //    renderCtx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
-            //  centerCount();
-            //}
           });
         }
         
